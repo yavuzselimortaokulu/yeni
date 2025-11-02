@@ -245,6 +245,99 @@ document.getElementById('tsr-envelope-btn')?.addEventListener('click', () => {
     background-color: #D32F2F !important;
   }
 </style>
+<style>
+/* --- injected fix for overflow in teacher stats --- */
+#teacher-stat-daily, #teacher-stat-weekly, #teacher-stat-monthly {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+</style>
+
+<!-- MOBILE RESPONSIVENESS PATCH START -->
+<meta name="theme-color" content="#4d2281">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<style id="mobile-responsiveness-patch">
+  /* Use dynamic viewport units on modern mobile browsers */
+  @supports (height: 100dvh) {
+    body { min-height: 100dvh; }
+  }
+  :root {
+    --safe-top: env(safe-area-inset-top);
+    --safe-bottom: env(safe-area-inset-bottom);
+  }
+  body { padding-bottom: max(var(--safe-bottom), 0px); }
+
+  /* Improve touch targets */
+  button, [role="button"], .tab-button,
+  .student-panel-tab-button, .parent-panel-tab-button,
+  .teacher-panel-tab-button, .panel-tab-button {
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+
+  /* Compact spacing on mobile */
+  @media (max-width: 640px) {
+    /* Nav title shrink + ellipsis */
+    #student-panel nav span.text-xl,
+    #parent-panel nav span.text-xl,
+    #teacher-panel nav span.text-xl,
+    #teacher-panel nav span.font-bold,
+    #student-panel nav span.font-bold,
+    #parent-panel nav span.font-bold {
+      font-size: 1rem !important;
+      max-width: 62vw;
+      display: inline-block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Reduce paddings to fit small screens */
+    .p-6 { padding: 1rem !important; }
+    .p-5 { padding: 0.875rem !important; }
+    .p-4 { padding: 0.75rem !important; }
+    .mb-6 { margin-bottom: 1rem !important; }
+
+    /* Calendars: tighter grid + smaller day font */
+    #student-calendar-grid, #parent-calendar-grid, #tsr-calendar-grid {
+      gap: 2px !important;
+    }
+    .day-cell-content { font-size: 0.75rem; }
+
+    /* Tables: allow full fluid width and tighter cells */
+    .table-container table {
+      min-width: 0 !important;
+      width: 100% !important;
+      table-layout: auto !important;
+      word-break: break-word;
+    }
+    .table-container th, .table-container td {
+      padding: 0.5rem 0.5rem !important;
+      font-size: 0.8rem !important;
+    }
+
+    /* Modals: nearly full-width with comfortable padding */
+    .modal-content {
+      width: 96% !important;
+      margin: 10% auto !important;
+      padding: 1rem !important;
+      border-radius: 14px !important;
+    }
+
+    /* Charts: limit vertical space on small screens */
+    canvas { max-height: 260px; }
+  }
+
+  @media (max-width: 380px) {
+    .day-cell-content { font-size: 0.65rem; }
+  }
+</style>
+<!-- MOBILE RESPONSIVENESS PATCH END -->
+
 </head>
 <body class="bg-gradient-to-br from-indigo-800 via-purple-800 to-indigo-900 text-white min-h-screen">
 <div class="space-y-2" id="notification-box"></div>
@@ -885,27 +978,24 @@ document.getElementById('tsr-envelope-btn')?.addEventListener('click', () => {
 <div class="bg-yellow-600 bg-opacity-30 p-3 rounded-full">
 <ion-icon class="text-3xl text-yellow-300" name="trophy-outline"></ion-icon>
 </div>
-<div>
-<div class="text-sm font-medium text-gray-300 uppercase">Günün Birincisi</div>
-<div class="text-lg font-bold text-white truncate" title=""><span class="text-lg font-bold text-white truncate" id="teacher-stat-daily"></span></div>
+<div class="min-w-0 flex-1"><div class="text-sm font-medium text-gray-300 uppercase">Günün Birincisi</div>
+<div class="text-lg font-bold text-white truncate" title=""><span <span class="text-lg font-bold text-white truncate block text-lg font-bold text-white truncate" id="teacher-stat-daily"></span></div>
 </div>
 </div>
 <div class="bg-transparent bg-opacity-20 backdrop-blur-lg rounded-2xl shadow-xl p-5 border border-white border-opacity-20 flex items-center space-x-4" style="background: linear-gradient(135deg, #411d6e 0%, #4d2281 50%, #55258e 100%) !important;">
 <div class="bg-green-600 bg-opacity-30 p-3 rounded-full">
 <ion-icon class="text-3xl text-green-300" name="ribbon-outline"></ion-icon>
 </div>
-<div>
-<div class="text-sm font-medium text-gray-300 uppercase">Haftanın Birincisi</div>
-<div class="text-lg font-bold text-white truncate" title=""><span class="text-lg font-bold text-white truncate" id="teacher-stat-weekly"></span></div>
+<div class="min-w-0 flex-1"><div class="text-sm font-medium text-gray-300 uppercase">Haftanın Birincisi</div>
+<div class="text-lg font-bold text-white truncate" title=""><span <span class="text-lg font-bold text-white truncate block text-lg font-bold text-white truncate" id="teacher-stat-weekly"></span></div>
 </div>
 </div>
 <div class="bg-transparent bg-opacity-20 backdrop-blur-lg rounded-2xl shadow-xl p-5 border border-white border-opacity-20 flex items-center space-x-4" style="background: linear-gradient(135deg, #411d6e 0%, #4d2281 50%, #55258e 100%) !important;">
 <div class="bg-purple-600 bg-opacity-30 p-3 rounded-full">
 <ion-icon class="text-3xl text-purple-300" name="school-outline"></ion-icon>
 </div>
-<div>
-<div class="text-sm font-medium text-gray-300 uppercase">Ayın Birincisi</div>
-<div class="text-lg font-bold text-white truncate" title=""><span class="text-lg font-bold text-white truncate" id="teacher-stat-monthly"></span></div>
+<div class="min-w-0 flex-1"><div class="text-sm font-medium text-gray-300 uppercase">Ayın Birincisi</div>
+<div class="text-lg font-bold text-white truncate" title=""><span <span class="text-lg font-bold text-white truncate block text-lg font-bold text-white truncate" id="teacher-stat-monthly"></span></div>
 </div>
 </div>
 </div>
