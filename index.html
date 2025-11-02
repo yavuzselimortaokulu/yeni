@@ -69,7 +69,15 @@ document.getElementById('tsr-envelope-btn')?.addEventListener('click', () => {
         .day-cell.other-month .day-cell-content { opacity: 0.2; pointer-events: none; }
         .day-cell:not(.other-month):hover .day-cell-content { background-color: rgba(255, 255, 255, 0.1); }
         .day-cell.selected .day-cell-content { border-color: rgba(168, 85, 247, 0.9); color: white; font-weight: bold; }
-        .day-cell.has-entry .day-cell-content::after {
+        
+
+        /* Bugünün günü (tüm panellerde) çerçeveli görünsün */
+        .day-cell.today:not(.selected) .day-cell-content {
+    border: 2px dashed #7C3AED; /* purple */
+    box-shadow: none;
+}
+
+    .day-cell.has-entry .day-cell-content::after {
             content: ''; position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%);
             width: 5px; height: 5px; background-color: #F87171; border-radius: 50%;
         }
@@ -107,7 +115,6 @@ document.getElementById('tsr-envelope-btn')?.addEventListener('click', () => {
 .student-detail-tab-content { display: none; }
 .student-detail-tab-content.active { display: block; }
 </style>
-
 <!-- PATCH: Favori yıldız rengi ve tıklama animasyonu (öğretmen paneli → sınıf öğrenci listesi) -->
 <style id="favorite-star-patch">
 /* Yalnızca sınıf listesinin açıldığı öğrenci listesi modalını hedefle */
@@ -143,7 +150,6 @@ document.getElementById('tsr-envelope-btn')?.addEventListener('click', () => {
   100% { transform: scale(1); }
 }
 </style>
-
 <style id="student-list-modal-purple-gradient">
   /* Öğretmen paneli → Öğrenci Listesi modalının arka planını mor degrade yap */
   #studentListModal .modal-content {
@@ -158,7 +164,6 @@ document.getElementById('tsr-envelope-btn')?.addEventListener('click', () => {
   /* (Opsiyonel) Modal içindeki çok açık beyaz overlay sınıfları varsa biraz yumuşat */
   #studentListModal .modal-content .bg-white.bg-opacity-5{ background-color: rgba(255,255,255,0.08); }
 </style>
-
 <style id="student-list-modal-purple-gradient-v2">
   /* Öğrenci Listesi modalı: referans görseldeki daha koyu mor ton */
   #studentListModal .modal-content {
@@ -173,11 +178,6 @@ document.getElementById('tsr-envelope-btn')?.addEventListener('click', () => {
     background-color: rgba(255,255,255,0.06) !important;
   }
 </style>
-
-
-
-
-
 <style id="report-tab-container-gradient">
   /* Rapor sekmesi kök kapsayıcılarının (panel-tab-content) arka planını da mor degrade yap */
   #student-panel .panel-tab-content#gunluk-rapor,
@@ -187,7 +187,6 @@ document.getElementById('tsr-envelope-btn')?.addEventListener('click', () => {
     background-color: transparent !important;
   }
 </style>
-
 <style id="studentDetailModal-purple">
   /* Öğrenci ismi tıklanınca açılan rapor modalı */
   #studentDetailModal .modal-content {
@@ -209,7 +208,6 @@ document.getElementById('tsr-envelope-btn')?.addEventListener('click', () => {
     background-color: transparent !important;
   }
 </style>
-
 <style id="studentDetailModal-home-backdrop">
   /* Öğrenci rapor modali arka planı: anasayfadaki gradient ile aynı */
   #studentDetailModal {
@@ -217,7 +215,6 @@ document.getElementById('tsr-envelope-btn')?.addEventListener('click', () => {
     background-color: transparent !important; /* rgba(0,0,0,.6) overlay'i sıfırla */
   }
 </style>
-
 <style id="no-spin-and-ghost-zero">
 /* Sadece Doğru/Yanlış alanları için number spinnerlarını kaldır */
 #dogru, #yanlis { -moz-appearance: textfield; }
@@ -228,7 +225,6 @@ document.getElementById('tsr-envelope-btn')?.addEventListener('click', () => {
 /* Odak alındığında (tıklanınca) placeholder '0' görünmesin */
 #dogru:focus::placeholder, #yanlis:focus::placeholder { color: transparent; }
 </style>
-
 <style id="topbar-gradient-patch">
   /* Üst şerit (öğretmen/öğrenci nav) mor gradyan */
   #teacher-panel > nav,
@@ -247,7 +243,7 @@ document.getElementById('tsr-envelope-btn')?.addEventListener('click', () => {
 </style>
 <style>
 /* --- injected fix for overflow in teacher stats --- */
-#teacher-stat-daily, #teacher-stat-weekly, #teacher-stat-monthly {
+#teacher-stat-daily-name, #teacher-stat-weekly-name, #teacher-stat-monthly-name {
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -255,11 +251,10 @@ document.getElementById('tsr-envelope-btn')?.addEventListener('click', () => {
   max-width: 100%;
 }
 </style>
-
 <!-- MOBILE RESPONSIVENESS PATCH START -->
-<meta name="theme-color" content="#4d2281">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta content="#4d2281" name="theme-color"/>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <style id="mobile-responsiveness-patch">
   /* Use dynamic viewport units on modern mobile browsers */
   @supports (height: 100dvh) {
@@ -337,7 +332,23 @@ document.getElementById('tsr-envelope-btn')?.addEventListener('click', () => {
   }
 </style>
 <!-- MOBILE RESPONSIVENESS PATCH END -->
+<style id="tsr-calendar-unframe">
+  /* Öğretmen paneli → Öğrenci detayı → Günlük Rapor: takvim kartı çerçevesini kaldır */
+  #studentDetailModal #tsr-gunluk-rapor > div{
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+</style>
 
+<style id="parent-genel-mobile-patch">
+  @media (max-width: 640px){
+    /* KPI kartları mobilde biraz daha sıkı dursun */
+    #parent-genel-ozet .grid > .bg-transparent { padding: 1rem !important; }
+    /* Donut grafiği kartında tuş hedefleri rahat olsun */
+    #getGeminiSummary { min-height: 48px; }
+  }
+</style>
 </head>
 <body class="bg-gradient-to-br from-indigo-800 via-purple-800 to-indigo-900 text-white min-h-screen">
 <div class="space-y-2" id="notification-box"></div>
@@ -454,10 +465,9 @@ document.getElementById('tsr-envelope-btn')?.addEventListener('click', () => {
 <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
 </svg>
 </div>
-<span class="text-xl font-bold text-white">YAVUZ SELİM ORTAOKULU (ÖĞRENCİ)</span>
+<div class="flex flex-col"><span class="text-xl font-bold text-white leading-tight">ÖĞRENCİ PANELİ</span><span class="text-sm text-gray-300 mt-0.5">Hoş Geldin, <span class="font-medium text-white" id="welcome-user-name">Kullanıcı Adı</span></span></div>
 </div>
 <div class="flex items-center space-x-4">
-<span class="hidden sm:block text-sm text-gray-300">Hoş Geldin, <span class="font-medium text-white" id="welcome-user-name">Kullanıcı Adı</span></span>
 <button class="bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 font-medium transition duration-150 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500" id="student-logout-button">
                             Çıkış Yap
                         </button>
@@ -679,13 +689,9 @@ document.getElementById('tsr-envelope-btn')?.addEventListener('click', () => {
 <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
 </svg>
 </div>
-<span class="text-xl font-bold text-white">YAVUZ SELİM ORTAOKULU (VELİ)</span>
+<span class="text-xl font-bold text-white">VELİ PANELİ</span>
 </div>
 <div class="flex items-center space-x-4">
-<div class="text-right text-sm">
-<div class="font-medium text-white" id="parent-welcome-veli-name">Veli: Ad Soyad</div>
-<div class="text-gray-300" id="parent-welcome-student-info">Öğrenci: Mehmet (000)</div>
-</div>
 <button class="bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-2 px-3 rounded-lg transition duration-150 flex items-center space-x-1" id="parent-logout-button">
 <ion-icon class="text-lg" name="log-out-outline"></ion-icon>
 <span>Çıkış Yap</span>
@@ -697,7 +703,8 @@ document.getElementById('tsr-envelope-btn')?.addEventListener('click', () => {
 <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
 <div class="mb-6">
 <h1 class="text-3xl font-bold text-white shadow-sm">Öğrenci Gelişim Özeti</h1>
-<p class="text-lg text-gray-300" id="parent-student-summary-title">Öğrenci Bilgisi yükleniyor...</p>
+<p class="text-lg text-gray-200" id="parent-welcome-greeting">Hoşgeldin, </p>
+<p class="text-base text-gray-300" id="parent-welcome-student-line">Öğrenci: </p>
 </div>
 <div class="flex flex-wrap gap-2 bg-transparent bg-opacity-20 border border-white border-opacity-20 rounded-lg p-1 mb-6 max-w-xl" style="background: linear-gradient(135deg, #411d6e 0%, #4d2281 50%, #55258e 100%) !important;">
 <button class="parent-panel-tab-button flex-auto text-sm font-medium py-2 px-3 rounded-md" data-tab="parent-genel-ozet">Genel Özet</button>
@@ -707,25 +714,13 @@ document.getElementById('tsr-envelope-btn')?.addEventListener('click', () => {
 </div>
 <div>
 <div class="panel-tab-content space-y-8" id="parent-genel-ozet">
-<div class="">
-<button class="w-full sm:w-auto bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-300 ease-in-out flex items-center justify-center space-x-2" id="getGeminiSummary">
-<ion-icon class="text-2xl" name="sparkles-outline"></ion-icon>
-<span>✨ Yapay Zeka Gelişim Özeti Al</span>
-</button>
-</div>
+
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
 <div class="bg-transparent bg-opacity-20 backdrop-blur-lg rounded-2xl shadow-xl p-6 border border-white border-opacity-20 flex items-center space-x-4" style="background: linear-gradient(135deg, #411d6e 0%, #4d2281 50%, #55258e 100%) !important;">
 <div class="bg-purple-600 bg-opacity-30 p-3 rounded-full"><ion-icon class="text-4xl text-purple-300" name="checkmark-done-circle-outline"></ion-icon></div>
 <div>
 <div class="text-sm font-medium text-gray-300 uppercase">Toplam Çözülen Soru</div>
 <p class="text-3xl font-bold text-white" id="parent-stat-total">0</p>
-</div>
-</div>
-<div class="bg-transparent bg-opacity-20 backdrop-blur-lg rounded-2xl shadow-xl p-6 border border-white border-opacity-20 flex items-center space-x-4" style="background: linear-gradient(135deg, #411d6e 0%, #4d2281 50%, #55258e 100%) !important;">
-<div class="bg-yellow-600 bg-opacity-30 p-3 rounded-full"><ion-icon class="text-4xl text-yellow-300" name="time-outline"></ion-icon></div>
-<div>
-<div class="text-sm font-medium text-gray-300 uppercase">Onay Bekleyen</div>
-<p class="text-3xl font-bold text-white" id="parent-stat-pending">0</p>
 </div>
 </div>
 <div class="bg-transparent bg-opacity-20 backdrop-blur-lg rounded-2xl shadow-xl p-6 border border-white border-opacity-20 flex items-center space-x-4" style="background: linear-gradient(135deg, #411d6e 0%, #4d2281 50%, #55258e 100%) !important;">
@@ -743,8 +738,8 @@ document.getElementById('tsr-envelope-btn')?.addEventListener('click', () => {
 </div>
 </div>
 </div>
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-<div class="lg:col-span-2">
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+<div class="lg:col-span-3">
 <div class="bg-transparent bg-opacity-20 backdrop-blur-lg rounded-2xl shadow-xl border border-white border-opacity-20 overflow-hidden" style="background: linear-gradient(135deg, #411d6e 0%, #4d2281 50%, #55258e 100%) !important;">
 <h3 class="text-xl font-semibold text-white p-6 border-b border-white border-opacity-10">Derslere Göre Dağılım</h3>
 <div class="overflow-x-auto">
@@ -756,27 +751,38 @@ document.getElementById('tsr-envelope-btn')?.addEventListener('click', () => {
 <th class="py-3 px-6 text-left text-sm font-medium text-gray-300 uppercase tracking-wider">Doğru</th>
 <th class="py-3 px-6 text-left text-sm font-medium text-gray-300 uppercase tracking-wider">Yanlış</th>
 <th class="py-3 px-6 text-left text-sm font-medium text-gray-300 uppercase tracking-wider">Başarı</th>
-<th class="py-3 px-6 text-left text-sm font-medium text-gray-300 uppercase tracking-wider">Durum</th>
+
 </tr>
 </thead>
 <tbody class="divide-y divide-white divide-opacity-10" id="parent-ders-tablosu-body">
-<tr><td class="py-4 px-6 text-center text-gray-400" colspan="6">Veri yükleniyor...</td></tr>
+<tr><td class="py-4 px-6 text-center text-gray-400" colspan="5">Veri yükleniyor...</td></tr>
 </tbody>
 </table>
 </div>
 </div>
 </div>
-<div class="lg:col-span-1">
-<div class="bg-transparent bg-opacity-20 backdrop-blur-lg rounded-2xl shadow-xl border border-white border-opacity-20 p-6" style="background: linear-gradient(135deg, #411d6e 0%, #4d2281 50%, #55258e 100%) !important;">
-<h3 class="text-xl font-semibold text-white mb-4">Öğretmen Notları</h3>
-<ul class="space-y-4" id="parent-ogretmen-notlari">
-<li class="p-4 bg-white bg-opacity-10 rounded-lg">
-<p class="not-icerigi text-sm text-gray-200">Notlar henüz eklenmedi.</p>
-</li>
-</ul>
+
 </div>
+
+<!-- MOBILE PATCH: Ders dağılımı donut + AI özet -->
+<div class="sm:hidden grid grid-cols-1 gap-4" id="parent-genel-mobile-block">
+  <div class="bg-transparent bg-opacity-20 backdrop-blur-lg rounded-2xl shadow-xl border border-white border-opacity-20 overflow-hidden"
+       style="background: linear-gradient(135deg, #411d6e 0%, #4d2281 50%, #55258e 100%) !important;">
+    <h3 class="text-lg font-semibold text-white p-4 border-b border-white border-opacity-10">
+      Ders Dağılımı (Özet)
+    </h3>
+    <div class="p-4">
+      <canvas id="parent-genel-donut-canvas" height="220"></canvas>
+    </div>
+  </div>
+
+  <!-- AI özet butonu -->
+  <button id="getGeminiSummary"
+          class="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-4 rounded-xl transition">
+    Yapay Zeka Özeti
+  </button>
 </div>
-</div>
+<!-- /MOBILE PATCH -->
 </div>
 <div class="panel-tab-content" id="parent-gunluk-rapor">
 <div class="bg-transparent bg-opacity-20 backdrop-blur-lg rounded-2xl shadow-2xl p-6 border border-white border-opacity-20" style="background: linear-gradient(135deg, #411d6e 0%, #4d2281 50%, #55258e 100%) !important;">
@@ -942,7 +948,6 @@ document.getElementById('tsr-envelope-btn')?.addEventListener('click', () => {
 <div class="flex items-center space-x-4">
 <div class="text-right text-sm">
 <div class="font-medium text-white hidden" id="teacher-welcome-name">Öğretmen: ...</div>
-<div class="text-gray-300" id="teacher-welcome-role">Yönetici</div>
 </div>
 <button class="bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-2 px-3 rounded-lg transition duration-150 flex items-center space-x-1" id="teacher-logout-button">
 <ion-icon class="text-lg" name="log-out-outline"></ion-icon>
@@ -979,7 +984,7 @@ document.getElementById('tsr-envelope-btn')?.addEventListener('click', () => {
 <ion-icon class="text-3xl text-yellow-300" name="trophy-outline"></ion-icon>
 </div>
 <div class="min-w-0 flex-1"><div class="text-sm font-medium text-gray-300 uppercase">Günün Birincisi</div>
-<div class="text-lg font-bold text-white truncate" title=""><span <span class="text-lg font-bold text-white truncate block text-lg font-bold text-white truncate" id="teacher-stat-daily"></span></div>
+<div class="text-lg font-bold text-white truncate" title=""><span class="block truncate" id="teacher-stat-daily-name"></span></div><div class="text-sm text-purple-200" id="teacher-stat-daily-count"></div>
 </div>
 </div>
 <div class="bg-transparent bg-opacity-20 backdrop-blur-lg rounded-2xl shadow-xl p-5 border border-white border-opacity-20 flex items-center space-x-4" style="background: linear-gradient(135deg, #411d6e 0%, #4d2281 50%, #55258e 100%) !important;">
@@ -987,7 +992,7 @@ document.getElementById('tsr-envelope-btn')?.addEventListener('click', () => {
 <ion-icon class="text-3xl text-green-300" name="ribbon-outline"></ion-icon>
 </div>
 <div class="min-w-0 flex-1"><div class="text-sm font-medium text-gray-300 uppercase">Haftanın Birincisi</div>
-<div class="text-lg font-bold text-white truncate" title=""><span <span class="text-lg font-bold text-white truncate block text-lg font-bold text-white truncate" id="teacher-stat-weekly"></span></div>
+<div class="text-lg font-bold text-white truncate" title=""><span class="block truncate" id="teacher-stat-weekly-name"></span></div><div class="text-sm text-purple-200" id="teacher-stat-weekly-count"></div>
 </div>
 </div>
 <div class="bg-transparent bg-opacity-20 backdrop-blur-lg rounded-2xl shadow-xl p-5 border border-white border-opacity-20 flex items-center space-x-4" style="background: linear-gradient(135deg, #411d6e 0%, #4d2281 50%, #55258e 100%) !important;">
@@ -995,7 +1000,7 @@ document.getElementById('tsr-envelope-btn')?.addEventListener('click', () => {
 <ion-icon class="text-3xl text-purple-300" name="school-outline"></ion-icon>
 </div>
 <div class="min-w-0 flex-1"><div class="text-sm font-medium text-gray-300 uppercase">Ayın Birincisi</div>
-<div class="text-lg font-bold text-white truncate" title=""><span <span class="text-lg font-bold text-white truncate block text-lg font-bold text-white truncate" id="teacher-stat-monthly"></span></div>
+<div class="text-lg font-bold text-white truncate" title=""><span class="block truncate" id="teacher-stat-monthly-name"></span></div><div class="text-sm text-purple-200" id="teacher-stat-monthly-count"></div>
 </div>
 </div>
 </div>
@@ -1012,19 +1017,11 @@ document.getElementById('tsr-envelope-btn')?.addEventListener('click', () => {
 <div class="bg-transparent bg-opacity-20 backdrop-blur-lg rounded-2xl shadow-2xl p-6 border border-white border-opacity-20" style="background: linear-gradient(135deg, #411d6e 0%, #4d2281 50%, #55258e 100%) !important;">
 <h2 class="text-2xl font-bold mb-5 text-purple-300">Sınıfları Yönet</h2>
 <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6">
-  <input
-    id="sinif-ekle-input"
-    type="text"
-    placeholder="Yeni sınıf adı (örn: 6-C)"
-    class="dark-input flex-grow p-2.5 rounded-lg min-w-0"
-  />
-  <button
-    id="sinif-ekle-buton"
-    class="bg-purple-600 hover:bg-purple-700 text-white font-medium py-2.5 px-6 rounded-lg transition-all flex items-center justify-center space-x-2 w-full sm:w-auto"
-  >
-    <ion-icon class="text-xl" name="add-circle-outline"></ion-icon>
-    <span>Ekle</span>
-  </button>
+<input class="dark-input flex-grow p-2.5 rounded-lg min-w-0" id="sinif-ekle-input" placeholder="Yeni sınıf adı (örn: 6-C)" type="text"/>
+<button class="bg-purple-600 hover:bg-purple-700 text-white font-medium py-2.5 px-6 rounded-lg transition-all flex items-center justify-center space-x-2 w-full sm:w-auto" id="sinif-ekle-buton">
+<ion-icon class="text-xl" name="add-circle-outline"></ion-icon>
+<span>Ekle</span>
+</button>
 </div>
 <div class="text-red-400 text-sm mb-4 hidden" id="sinif-hata-mesaji"></div>
 <div class="">
@@ -1068,12 +1065,11 @@ document.getElementById('tsr-envelope-btn')?.addEventListener('click', () => {
 <button class="student-detail-tab-button flex-auto text-sm font-medium py-2 px-3 rounded-md" data-tab="tsr-gunluk-rapor">Günlük Rapor</button>
 <button class="student-detail-tab-button flex-auto text-sm font-medium py-2 px-3 rounded-md" data-tab="tsr-haftalik-rapor">Haftalık Rapor</button>
 <button class="student-detail-tab-button flex-auto text-sm font-medium py-2 px-3 rounded-md" data-tab="tsr-aylik-rapor">Aylık Rapor</button>
-
-<button id="tsr-envelope-btn" role="button" class="flex-none text-lg font-medium py-2 px-3 rounded-md hover:bg-white hover:bg-opacity-10 focus:outline-none focus:ring-2 focus:ring-purple-500" title="Mesaj">✉️</button>
+<button class="flex-none text-lg font-medium py-2 px-3 rounded-md hover:bg-white hover:bg-opacity-10 focus:outline-none focus:ring-2 focus:ring-purple-500" id="tsr-envelope-btn" role="button" title="Mesaj">✉️</button>
 </div>
 <div>
 <div class="student-detail-tab-content" id="tsr-gunluk-rapor">
-<div class="bg-transparent bg-opacity-20 backdrop-blur-lg rounded-2xl shadow-2xl p-6 border border-white border-opacity-20" style="background: linear-gradient(135deg, #411d6e 0%, #4d2281 50%, #55258e 100%) !important;">
+<div class="bg-transparent bg-opacity-20 backdrop-blur-lg rounded-2xl shadow-2xl p-6 border border-white border-opacity-20">
 <h2 class="text-2xl font-bold mb-5 text-purple-300">Günlük Rapor</h2>
 <div class="flex justify-between items-center mb-4">
 <button class="p-2 rounded-full hover:bg-white hover:bg-opacity-10 transition focus:outline-none focus:ring-2 focus:ring-purple-500" id="tsr-prev-month">
@@ -1252,13 +1248,45 @@ document.getElementById('tsr-envelope-btn')?.addEventListener('click', () => {
 
         // --- Yardımcı Fonksiyonlar ---
 
-        function showNotification(message, type = 'success', duration = 3000) {
+        function showNotification(message, type = 'success', duration = 1500) {
+  duration = 1500;
             const box = document.createElement('div');
             let colorClass = (type === 'success') ? 'bg-green-600' : (type === 'error') ? 'bg-red-600' : 'bg-blue-600';
             
             box.className = `${colorClass} text-white p-3 mb-2 rounded-lg shadow-xl transition-opacity duration-300 ease-out opacity-0 translate-y-2`;
             box.textContent = message;
-            box.style.pointerEvents = 'auto'; 
+            box.style.pointerEvents = 'auto';
+// Yeşil (success) ve mavi (info) uyarıları sayfanın ortasına getir
+if (type === 'success' || type === 'info' || type === 'error') {
+  box.style.position = 'fixed';
+  box.style.top = '50%';
+  box.style.left = '50%';
+  box.style.transform = 'translate(-50%, -50%)';
+  box.style.right = 'auto';
+  box.style.textAlign = 'center';
+  box.style.minWidth = 'min(90vw, 420px)';
+  box.style.pointerEvents = 'auto';
+  // Biraz daha ferah görünsün
+  box.className += ' px-6 py-4';
+
+  // Yarı saydam arka plan rengi (type'a göre)
+  try {
+    var bgMap = {
+      'success': 'rgba(34, 197, 94, 0.72)',   // tailwind green-500
+      'info':    'rgba(59, 130, 246, 0.72)',  // tailwind blue-500
+      'error':   'rgba(239, 68, 68, 0.72)'    // tailwind red-500
+    };
+    if (!box.style.backgroundColor || box.style.backgroundColor.indexOf('rgba') !== 0) {
+      box.style.backgroundColor = bgMap[type] || 'rgba(17, 24, 39, 0.72)'; // fallback slate-900
+    } else {
+      box.style.backgroundColor = bgMap[type] || box.style.backgroundColor;
+    }
+    box.style.color = '#ffffff';
+    box.style.border = '1px solid rgba(255, 255, 255, 0.25)';
+    box.style.backdropFilter = 'blur(4px)';
+  } catch (e) {}
+
+} 
             
             const notificationBox = document.getElementById('notification-box');
             if(notificationBox) {
@@ -1311,11 +1339,29 @@ document.getElementById('tsr-envelope-btn')?.addEventListener('click', () => {
                     
                     const studentInfo = `${userData.cocukAd} ${userData.cocukSoyad} (${userData.cocukSinif})`;
 
-                    document.getElementById('parent-welcome-veli-name').textContent = `Veli: ${currentUserName}`;
-                    document.getElementById('parent-welcome-student-info').textContent = `Öğrenci: ${studentInfo}`;
-                    document.getElementById('parent-student-summary-title').textContent = `${studentInfo} için genel durum.`;
-
-                    document.getElementById('parent-panel').classList.remove('hidden');
+// Hoşgeldin ve öğrenci satırlarını güncelle (öğrenci adı okul numarasından çekilir)
+const veliAdSoyad = (typeof toTitleCaseTR === 'function') ? toTitleCaseTR(currentUserName) : currentUserName;
+const greetEl = document.getElementById('parent-welcome-greeting');
+const studentLineEl = document.getElementById('parent-welcome-student-line');
+if (greetEl) greetEl.textContent = `Hoşgeldin, ${veliAdSoyad}`;
+if (studentLineEl) studentLineEl.textContent = 'Öğrenci: ...';
+database.ref('users/ogrenciler/' + currentStudentId).once('value').then(snap => {
+  if (snap.exists()) {
+    const s = snap.val();
+    const oAd = (typeof toTitleCaseTR === 'function') ? toTitleCaseTR(s.ad || '') : (s.ad || '');
+    const oSoyad = (typeof toTitleCaseTR === 'function') ? toTitleCaseTR(s.soyad || '') : (s.soyad || '');
+    if (studentLineEl) studentLineEl.textContent = `Öğrenci: ${oAd} ${oSoyad}`;
+  } else {
+    const fallAd = (typeof toTitleCaseTR === 'function') ? toTitleCaseTR(userData.cocukAd || '') : (userData.cocukAd || '');
+    const fallSoyad = (typeof toTitleCaseTR === 'function') ? toTitleCaseTR(userData.cocukSoyad || '') : (userData.cocukSoyad || '');
+    if (studentLineEl) studentLineEl.textContent = `Öğrenci: ${fallAd} ${fallSoyad}`;
+  }
+}).catch(_ => {
+  const fallAd = (typeof toTitleCaseTR === 'function') ? toTitleCaseTR(userData.cocukAd || '') : (userData.cocukAd || '');
+  const fallSoyad = (typeof toTitleCaseTR === 'function') ? toTitleCaseTR(userData.cocukSoyad || '') : (userData.cocukSoyad || '');
+  if (studentLineEl) studentLineEl.textContent = `Öğrenci: ${fallAd} ${fallSoyad}`;
+});
+document.getElementById('parent-panel').classList.remove('hidden');
                     loadInitialData(); // Veli girişi, çocuğunun verilerini yükler
                 } else {
                     showScreen('auth-page');
@@ -1444,7 +1490,7 @@ document.getElementById('tsr-envelope-btn')?.addEventListener('click', () => {
                 document.getElementById('parent-stat-total').textContent = totalQuestions;
                 document.getElementById('parent-stat-weekly').textContent = `${weeklyTotal} Soru`;
                 document.getElementById('parent-stat-success').textContent = `${successRate}%`;
-                document.getElementById('parent-stat-pending').textContent = `0`;
+                const pendingEl = document.getElementById('parent-stat-pending'); if (pendingEl) pendingEl.textContent = `0`;
                 renderParentSummaryTable();
             }
         }
@@ -1504,13 +1550,13 @@ document.getElementById('tsr-envelope-btn')?.addEventListener('click', () => {
                         <td class="ders-dogru py-4 px-6 text-green-400">${data.d}</td>
                         <td class="ders-yanlis py-4 px-6 text-red-400">${data.y}</td>
                         <td class="ders-basari py-4 px-6 ${successClass} font-medium">${successRate}%</td>
-                        <td class="py-4 px-6"><button class="bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold py-1.5 px-3 rounded-full transition-all">Detay Gör</button></td>
+                        
                     `;
                     tbody.appendChild(row);
                 }
             });
             if (!hasData) {
-                tbody.innerHTML = '<tr><td colspan="6" class="py-4 px-6 text-center text-gray-400">Çocuğunuz bu ay henüz soru çözümü kaydetmedi.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" class="py-4 px-6 text-center text-gray-400">Çocuğunuz bu ay henüz soru çözümü kaydetmedi.</td></tr>';
             }
         }
         
@@ -1578,6 +1624,12 @@ document.getElementById('tsr-envelope-btn')?.addEventListener('click', () => {
                 cell.className = 'day-cell';
                 if (isOtherMonth) cell.classList.add('other-month');
                 if (hasEntry) cell.classList.add('has-entry');
+                // Bugün mü? (sadece mevcut aya ait günler için)
+                const __todayISO = new Date().toISOString().substring(0, 10);
+                if (!isOtherMonth && dateString === __todayISO) {
+                    cell.classList.add('today');
+                }
+
                 const content = document.createElement('div');
                 content.className = 'day-cell-content';
                 content.textContent = day;
@@ -1864,7 +1916,8 @@ if (weeklyDetailsBodyEl.children.length === 0) {
         if(closeGeminiModal) closeGeminiModal.onclick = () => hideModal(resultModal);
         if(closeGeminiModalBtn) closeGeminiModalBtn.onclick = () => hideModal(resultModal);
         function scrapeDashboardData() {
-            let data = `Çocuğumun (${document.getElementById('parent-welcome-student-info').textContent}) güncel soru takip verileri aşağıdadır:\n\n`;
+            const _studentLine = (document.getElementById('parent-welcome-student-line')?.textContent || '').replace(/^Öğrenci:\s*/,'');
+            let data = `Çocuğumun (${_studentLine}) güncel soru takip verileri aşağıdadır:\n\n`;
             data += "### Genel İstatistikler\n";
             data += `- Toplam Çözülen Soru: ${document.getElementById('parent-stat-total')?.textContent}\n`;
             data += `- Haftalık İlerleme: ${document.getElementById('parent-stat-weekly')?.textContent}\n`;
@@ -2074,7 +2127,7 @@ if (weeklyDetailsBodyEl.children.length === 0) {
                                     clearLogin('ogrenci');
                                 }
                                 // --- /İSTEK 3 ---
-                                showNotification(`Başarılı: Sayın ${userData.ad} ${userData.soyad}, sisteme hoş geldiniz!`, 'success', 3000);
+                                showNotification(`Başarılı: Sayın ${toTitleCaseTR(userData.ad)} ${toTitleCaseTR(userData.soyad)}, sisteme hoş geldiniz!`, 'success', 3000);
                                 userData.ogrenciNo = ogrenciNo;
                                 showScreen('student-panel', userData); 
                                 // Formu sadece hatırlama seçili değilse temizle
@@ -2105,7 +2158,7 @@ if (weeklyDetailsBodyEl.children.length === 0) {
                                     clearLogin('veli');
                                 }
                                 // --- /İSTEK 3 ---
-                                showNotification(`Başarılı: Sayın Veli ${userData.ad} ${userData.soyad}, sisteme hoş geldiniz!`, 'success', 3000);
+                                showNotification(`Başarılı: Sayın Veli ${toTitleCaseTR(userData.ad)} ${toTitleCaseTR(userData.soyad)}, sisteme hoş geldiniz!`, 'success', 3000);
                                 userData.veliId = veliId;
                                 showScreen('parent-panel', userData); 
                                 if (!remember) e.target.reset();
@@ -2135,7 +2188,7 @@ if (weeklyDetailsBodyEl.children.length === 0) {
                         clearLogin('ogretmen');
                     }
                     // --- /İSTEK 3 ---
-                    showNotification(`Giriş Başarılı! Hoş geldiniz, ${adSoyad}.`, 'success');
+                    showNotification(`Giriş Başarılı! Hoş geldiniz, ${toTitleCaseTR(adSoyad)}.`, 'success');
                     showScreen('teacher-panel', { adSoyad: adSoyad });
                     if (!remember) e.target.reset();
                 } else {
@@ -2806,19 +2859,38 @@ function recomputeTeacherSummary() {
             });
 
             function setWinner(elId, totalsObj) {
-                const el = document.getElementById(elId);
-                if (!el) return;
+                // elId is the historical base id, but now we have -name and -count targets
+                var nameEl = document.getElementById(elId + '-name');
+                var countEl = document.getElementById(elId + '-count');
+                var legacyEl = document.getElementById(elId); // keep fallback compatibility
+
                 let bestId = null, bestVal = 0;
-                Object.keys(totalsObj).forEach((sid) => {
-                    const v = totalsObj[sid] || 0;
+                Object.keys(totalsObj || {}).forEach(function(sid){
+                    var v = totalsObj[sid] || 0;
                     if (v > bestVal) { bestVal = v; bestId = sid; }
                 });
-                if (!bestId) { el.textContent = '—'; el.parentElement?.setAttribute('title',''); return; }
-                const stu = teacherStudents[bestId] || {};
-                const name = [stu.ad, stu.soyad].filter(Boolean).join(' ') || bestId;
-                const label = `${name} (${bestVal} Soru)`;
-                el.textContent = label;
-                el.parentElement?.setAttribute('title', label);
+
+                if (!bestId) {
+                    if (nameEl) nameEl.textContent = '—';
+                    if (countEl) countEl.textContent = '';
+                    if (legacyEl) { legacyEl.textContent = '—'; if (legacyEl.parentElement) legacyEl.parentElement.setAttribute('title',''); }
+                    return;
+                }
+
+                var stu = (typeof teacherStudents !== 'undefined' && teacherStudents[bestId]) ? teacherStudents[bestId] : {};
+                var name = [stu.ad, stu.soyad].filter(Boolean).join(' ') || bestId;
+
+                if (nameEl) nameEl.textContent = name;
+                if (countEl) countEl.textContent = bestVal + ' Soru';
+
+                // title attribute for hover
+                var parent = (nameEl && nameEl.parentElement) || (legacyEl && legacyEl.parentElement) || null;
+                if (parent && parent.setAttribute) parent.setAttribute('title', name + ' (' + bestVal + ' Soru)');
+
+                // Backward compatibility for old single-line span if it still exists
+                if (legacyEl) {
+                    legacyEl.textContent = name + ' (' + bestVal + ' Soru)';
+                }
             }
             setWinner('teacher-stat-daily',  totalsDay);
             setWinner('teacher-stat-weekly', totalsWeek);
@@ -2855,7 +2927,6 @@ function recomputeTeacherSummary() {
         }
 
 </script>
-
 <script id="teacher-student-detail-modal-fixes">
 (function(){
   var mdl = document.getElementById('studentDetailModal');
@@ -2874,11 +2945,6 @@ function recomputeTeacherSummary() {
   window.studentDetailModalContent = document.getElementById('studentDetailModalContent');
 })();
 </script>
-
-
-
-
-
 <script id="teacher-delete-student">
 // Tüm öğrenci verilerini tek seferde sil (ogrenci, sorular, veli kaydı, favoriler)
 // Root-level update bazı güvenlik kurallarında engellenebileceği için tek tek remove() kullanıyoruz.
@@ -2898,8 +2964,6 @@ function deleteStudentCompletely(studentId){
     return Promise.all(tasks).then(function(){ return true; });
 }
 </script>
-
-
 <script id="teacher-delete-student-listener">
 // Yedek dinleyici: Olay yakalama aşamasında delete-student-btn tıklarını ele al.
 document.addEventListener('click', function(e){
@@ -2934,8 +2998,6 @@ document.addEventListener('click', function(e){
       });
 }, true); // capture
 </script>
-
-
 <script id="ghost-zero-init">
 document.addEventListener('DOMContentLoaded', function () {
   const dogru = document.getElementById('dogru');
@@ -2962,7 +3024,6 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 });
 </script>
-
 <script id="topbar-gradient-overwrite">
   // Inline style'da !important varsa bile üzerine yazabilmek için JS ile ayarla
   document.addEventListener('DOMContentLoaded', function () {
@@ -2973,7 +3034,6 @@ document.addEventListener('DOMContentLoaded', function () {
     if (s) { s.style.background = grad; }
   });
 </script>
-
 <script>
   function toTitleCaseTR(str) {
     if (!str) return '';
@@ -2992,9 +3052,155 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 </script>
 
+<script id="parent-genel-mobile-patch-js">
+// == MOBILE PATCH: donut + AI summary ==
+(function(){
+  // Singleton chart
+  let parentDonutChart = null;
+
+  function deriveSubjectTotalsFromDOM(){
+    const map = {};
+    const rows = document.querySelectorAll('#parent-ders-tablosu-body tr');
+    rows.forEach(r => {
+      const tds = r.querySelectorAll('td');
+      if (tds.length >= 2){
+        const ders = (tds[0].textContent || '').trim();
+        const toplam = parseInt((tds[1].textContent || '0').replace(/[^0-9]/g,'')) || 0;
+        if (!map[ders]) map[ders] = 0;
+        map[ders] += toplam;
+      }
+    });
+    return map;
+  }
+
+  function renderParentDonutChart(subjectTotals){
+    const canvas = document.getElementById('parent-genel-donut-canvas');
+    if (!canvas || typeof Chart === 'undefined') return;
+
+    // Fallback to DOM-derived totals if none provided
+    const totals = subjectTotals && Object.keys(subjectTotals).length ? subjectTotals : deriveSubjectTotalsFromDOM();
+
+    // Prepare labels / values
+    let labels = [];
+    let values = [];
+    const keys = Object.keys(totals);
+    if (window.allSubjectsFull && window.allSubjectsMap){
+      // Keep platform's subject ordering if available
+      window.allSubjectsFull.forEach(sn => {
+        const label = window.allSubjectsMap[sn] || sn;
+        const val = totals[sn] || 0;
+        labels.push(label);
+        values.push(val);
+      });
+      // Add any extra subjects that weren't in allSubjectsFull
+      keys.forEach(k => {
+        if (!window.allSubjectsFull.includes(k)){
+          labels.push(k);
+          values.push(totals[k] || 0);
+        }
+      });
+    } else {
+      labels = keys;
+      values = keys.map(k => totals[k] || 0);
+    }
+
+    if (parentDonutChart) try { parentDonutChart.destroy(); } catch(e){}
+    const ctx = canvas.getContext('2d');
+    parentDonutChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: { labels, datasets: [{ data: values, borderWidth: 1 }] },
+      options: {
+        plugins: { legend: { labels: { color: '#d1d5db' } } },
+        maintainAspectRatio: false
+      }
+    });
+  }
+
+  function generateLocalSummaryFromDOM() {
+    const total = document.getElementById('parent-stat-total')?.textContent || '0';
+    const weekly = document.getElementById('parent-stat-weekly')?.textContent || '0';
+    const success = document.getElementById('parent-stat-success')?.textContent || '-%';
+    let top = null;
+    document.querySelectorAll('#parent-ders-tablosu-body tr').forEach(r => {
+      const c = r.querySelectorAll('td');
+      if (c.length >= 5) {
+        const ders   = (c[0].textContent || '').trim();
+        const toplam = parseInt((c[1].textContent || '0').replace(/[^0-9]/g,'')) || 0;
+        const basari = (c[4].textContent || '').trim();
+        if (!top || toplam > top.toplam) top = { ders, toplam, basari };
+      }
+    });
+    return [
+      '### Kısa Özet',
+      `* Toplam Soru: **${total}**`,
+      `* Bu Hafta: **${weekly}**`,
+      `* Genel Başarı: **${success}**`,
+      '',
+      '### Öne Çıkan Ders',
+      top ? `* **${top.ders}**: ${top.toplam} soru, başarı ${top.basari}` : '* Henüz ders bazlı veri yok.',
+      '',
+      '### Evde 3 Öneri',
+      '* Her gün 20 dk tekrar ve mini hedef',
+      '* Yanlışlar için “hata defteri” tutma',
+      `* ${top ? top.ders : 'Matematik'} için günlük 5 ek soru hedefi`
+    ].join('\n');
+  }
+
+  function attachParentAIButtonOnce() {
+    const btn = document.getElementById('getGeminiSummary');
+    if (!btn || btn.getAttribute('data-attached') === 'true') return;
+
+    btn.addEventListener('click', async () => {
+      try {
+        if (typeof showModal === 'function' && typeof loadingModal !== 'undefined') showModal(loadingModal);
+        let text;
+        try {
+          if (typeof callGeminiAPI === 'function' && typeof scrapeDashboardData === 'function') {
+            text = await callGeminiAPI(scrapeDashboardData());
+          } else {
+            text = generateLocalSummaryFromDOM();
+          }
+        } catch (e) {
+          text = generateLocalSummaryFromDOM();
+        }
+        if (typeof resultContent !== 'undefined' && typeof formatGeminiResponse === 'function') {
+          resultContent.innerHTML = formatGeminiResponse(text);
+          if (typeof showModal === 'function' && typeof resultModal !== 'undefined') showModal(resultModal);
+        } else {
+          // Minimal fallback: alert
+          alert(text);
+        }
+      } finally {
+        if (typeof hideModal === 'function' && typeof loadingModal !== 'undefined') hideModal(loadingModal);
+      }
+    });
+
+    btn.setAttribute('data-attached', 'true');
+  }
+
+  function schedulePatch(){
+    try { renderParentDonutChart(); } catch(e){}
+    try { attachParentAIButtonOnce(); } catch(e){}
+  }
+
+  // Wrap renderParentSummaryTable if it exists, to run after updates
+  if (typeof window !== 'undefined'){
+    const original = window.renderParentSummaryTable;
+    if (typeof original === 'function'){
+      window.renderParentSummaryTable = function(...args){
+        const ret = original.apply(this, args);
+        try { schedulePatch(); } catch(e){}
+        return ret;
+      };
+    } else {
+      // Otherwise, try once on DOM ready
+      document.addEventListener('DOMContentLoaded', schedulePatch);
+    }
+  }
+})();
+</script>
 </body>
 </html>
-
 <!-- PATCH: Günlük Rapor Takvimi — Sıkı Yerleşim (v3, responsive) -->
 <style id="calendar-compact-hard-override">
 :root {
@@ -3037,7 +3243,6 @@ document.addEventListener('DOMContentLoaded', function () {
   font-size: var(--cal-font);
 }
 </style>
-
 <script id="calendar-compact-align">
 (function(){
   function applyCalendarSizing(){
@@ -3071,4 +3276,3 @@ document.addEventListener('DOMContentLoaded', function () {
   document.addEventListener('DOMContentLoaded', applyCalendarSizing);
 })();
 </script>
-
