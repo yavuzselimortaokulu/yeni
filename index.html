@@ -1430,11 +1430,30 @@ document.getElementById('parent-panel').classList.remove('hidden');
         }
         
         // Veli ve Öğrenci Panellerindeki istatistikleri ortak güncelleme (GÜNCELLENDİ - İSTEK 1)
-        function updateStatistics() {
+        
+// === Yerel tarih yardımcıları ===
+function formatDateLocalISO(date) {
+  const d = new Date(date);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+function todayLocalISO() {
+  return formatDateLocalISO(new Date());
+}
+function monthLocalPrefix(baseDate = new Date()) {
+  const d = new Date(baseDate);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  return `${y}-${m}`;
+}
+// =================================
+function updateStatistics() {
             let totalCorrect = 0, totalQuestions = 0, todayTotal = 0, weeklyTotal = 0;
             // 'recentEntries' dizisi artık gerekli değil, kaldırıldı.
 
-            const todayISO = new Date().toISOString().substring(0, 10);
+            const todayISO = todayLocalISO();
             const today = new Date();
             const startOfWeek = new Date(today);
             startOfWeek.setHours(0,0,0,0);
@@ -1633,7 +1652,7 @@ document.getElementById('parent-panel').classList.remove('hidden');
                 if (isOtherMonth) cell.classList.add('other-month');
                 if (hasEntry) cell.classList.add('has-entry');
                 // Bugün mü? (sadece mevcut aya ait günler için)
-                const __todayISO = new Date().toISOString().substring(0, 10);
+                const __todayISO = todayLocalISO();
                 if (!isOtherMonth && dateString === __todayISO) {
                     cell.classList.add('today');
                 }
@@ -1681,27 +1700,27 @@ document.getElementById('parent-panel').classList.remove('hidden');
         // --- Haftalık Rapor Mantığı (Ortak - Öğrenci/Veli) ---
         let weeklyChartInstance = {}; 
         function getWeekLabel(date) {
-    // UTC tabanlı hafta etiketi (Pazartesi başlangıç)
+    // Yerel (TR) tabanlı hafta etiketi (Pazartesi başlangıç)
     const d = new Date(date);
-    const baseUTC = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
-    const dow = baseUTC.getUTCDay(); // 0=PAZ, 1=PZT
+    const base = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    const dow = base.getDay(); // 0=PAZ, 1=PZT
     const diff = (dow === 0 ? -6 : 1 - dow); // Pazartesiye kaydır
-    const firstDayUTC = new Date(baseUTC);
-    firstDayUTC.setUTCDate(firstDayUTC.getUTCDate() + diff);
-    const lastDayUTC = new Date(firstDayUTC);
-    lastDayUTC.setUTCDate(lastDayUTC.getUTCDate() + 6);
-    // Etiketi yerel dilde gösterelim
+    const first = new Date(base);
+    first.setDate(first.getDate() + diff);
+    const last = new Date(first);
+    last.setDate(last.getDate() + 6);
     const options = { day: 'numeric', month: 'short' };
-    return `${new Date(firstDayUTC).toLocaleDateString('tr-TR', options)} - ${new Date(lastDayUTC).toLocaleDateString('tr-TR', options)}`;
+    return `${first.toLocaleDateString('tr-TR', options)} – ${last.toLocaleDateString('tr-TR', options)}`;
 }
         function getWeeklyData(weekStartDate) {
-    // weekStartDate: 'YYYY-MM-DD' (UTC gün sınırında)
+    // weekStartDate: 'YYYY-MM-DD' (yerel gün sınırında)
     const data = {};
-    const start = new Date(weekStartDate + 'T00:00:00Z'); // UTC başlat
+    const [y, m, d] = weekStartDate.split('-').map(Number);
+    const start = new Date(y, m - 1, d); // yerel 00:00
     for (let i = 0; i < 7; i++) {
         const day = new Date(start);
-        day.setUTCDate(start.getUTCDate() + i); // UTC gün ekle
-        const dateKey = day.toISOString().substring(0, 10); // UTC 'YYYY-MM-DD'
+        day.setDate(start.getDate() + i); // Yerel gün ekle
+        const dateKey = formatDateLocalISO(day); // 'YYYY-MM-DD' (yerel)
         const dailyEntries = allQuestionEntries[dateKey];
         allSubjectsFull.forEach(ders => {
             if (!data[ders]) data[ders] = [];
@@ -1739,22 +1758,23 @@ document.getElementById('parent-panel').classList.remove('hidden');
             const weeklyDetailsBodyEl = document.getElementById(`${prefix}-weekly-details-body`);
             if (!weekSelectEl || !weeklyChartCanvasEl || !weeklyDetailsBodyEl) return;
             function populateWeekSelector() {
-    // UTC tabanlı "Bu Hafta" ve önceki haftalar (Pazartesi başlangıç)
+    // Yerel tabanlı "Bu Hafta" ve önceki haftalar (Pazartesi başlangıç)
     const today = new Date();
+    today.setHours(0,0,0,0);
     weekSelectEl.innerHTML = '';
     for (let i = 0; i < 4; i++) {
         const option = document.createElement('option');
-        // Bugünden UTC olarak i hafta geriye git
-        const baseUTC = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()));
-        baseUTC.setUTCDate(baseUTC.getUTCDate() - (i * 7));
-        // Bu haftanın UTC Pazartesisi
-        const dow = baseUTC.getUTCDay();
+        // Bugünden yerel olarak i hafta geriye git
+        const base = new Date(today);
+        base.setDate(base.getDate() - (i * 7));
+        // Bu haftanın yerel Pazartesisi
+        const dow = base.getDay();
         const diff = (dow === 0 ? -6 : 1 - dow);
-        const startOfWeekUTC = new Date(baseUTC);
-        startOfWeekUTC.setUTCDate(startOfWeekUTC.getUTCDate() + diff);
-        option.value = startOfWeekUTC.toISOString().substring(0, 10); // 'YYYY-MM-DD' (UTC)
+        const startOfWeek = new Date(base);
+        startOfWeek.setDate(startOfWeek.getDate() + diff);
+        option.value = formatDateLocalISO(startOfWeek); // 'YYYY-MM-DD' (yerel)
         const label = (i === 0) ? "Bu Hafta" : (i === 1) ? "Geçen Hafta" : `${i} Hafta Önce`;
-        option.textContent = `${label} (${getWeekLabel(startOfWeekUTC)})`;
+        option.textContent = `${label} (${getWeekLabel(startOfWeek)})`;
         weekSelectEl.appendChild(option);
     }
 }
@@ -1846,7 +1866,7 @@ if (weeklyDetailsBodyEl.children.length === 0) {
             const monthlyDetailsBodyEl = document.getElementById(`${prefix}-monthly-details-body`);
             if (!monthInputEl || !monthlyChartCanvasEl || !monthlyDetailsBodyEl) return;
             const today = new Date();
-            const currentMonthISO = today.toISOString().substring(0, 7);
+            const currentMonthISO = monthLocalPrefix(today);
             monthInputEl.value = currentMonthISO;
             function renderMonthlyReport(monthId) { // monthId formatı: "YYYY-MM"
                 const data = getMonthlyData(monthId);
@@ -2232,7 +2252,7 @@ if (weeklyDetailsBodyEl.children.length === 0) {
                 if (currentUserRole !== 'ogrenci' || !currentUserId) { showNotification("Soru girişi için öğrenci olarak giriş yapmalısınız.", 'error'); return; }
                 if (ders === "") { showNotification("Lütfen bir ders seçin.", 'error'); return; }
                 if (total <= 0) { showNotification("En az bir soru çözülmüş olmalıdır.", 'error'); return; }
-                const todayISO = new Date().toISOString().substring(0, 10);
+                const todayISO = todayLocalISO();
                 const refPath = `users/sorular/${currentUserId}/${todayISO}/${ders}`;
                 database.ref(refPath).once('value')
                     .then(snapshot => {
@@ -2861,12 +2881,12 @@ function recomputeTeacherSummary() {
 
             const today = new Date();
             today.setHours(0,0,0,0);
-            const todayISO = new Date().toISOString().substring(0,10);
+            const todayISO = todayLocalISO();
 
             const startOfWeek = new Date(today);
             startOfWeek.setDate(today.getDate() - today.getDay() + (today.getDay() === 0 ? -6 : 1));
 
-            const monthPrefix = new Date().toISOString().substring(0,7); 
+            const monthPrefix = monthLocalPrefix(); 
 
             const totalsDay = {};
             const totalsWeek = {};
