@@ -6,12 +6,6 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Soru Takip Programı - Giriş ve Panel</title>
 <script src="https://cdn.tailwindcss.com">
-// --- Mesaj (✉️) butonu: placeholder ---
-document.getElementById('tsr-envelope-btn')?.addEventListener('click', () => {
-  try { showNotification('Mesaj butonu: işlev yakında eklenecek.', 'info'); }
-  catch (e) { console.log('Mesaj butonu tıklandı.'); }
-});
-
 </script>
 <script src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js" type="module"></script>
 <script nomodule="" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
@@ -1065,7 +1059,24 @@ document.getElementById('tsr-envelope-btn')?.addEventListener('click', () => {
 <button class="student-detail-tab-button flex-auto text-sm font-medium py-2 px-3 rounded-md" data-tab="tsr-gunluk-rapor">Günlük Rapor</button>
 <button class="student-detail-tab-button flex-auto text-sm font-medium py-2 px-3 rounded-md" data-tab="tsr-haftalik-rapor">Haftalık Rapor</button>
 <button class="student-detail-tab-button flex-auto text-sm font-medium py-2 px-3 rounded-md" data-tab="tsr-aylik-rapor">Aylık Rapor</button>
-<button class="flex-none text-lg font-medium py-2 px-3 rounded-md hover:bg-white hover:bg-opacity-10 focus:outline-none focus:ring-2 focus:ring-purple-500" id="tsr-envelope-btn" role="button" title="Mesaj">✉️</button>
+<button class="student-detail-tab-button flex-auto text-sm font-medium py-2 px-3 rounded-md" data-tab="tsr-ogretmen-mesaji">Öğretmen Mesajı</button>
+</div>
+
+<div class="student-detail-tab-content" id="tsr-ogretmen-mesaji">
+  <div class="bg-transparent bg-opacity-20 backdrop-blur-lg rounded-2xl shadow-2xl p-6 border border-white border-opacity-20">
+    <h2 class="text-2xl font-bold mb-5 text-purple-300">Öğretmen Mesajı</h2>
+    <p class="text-gray-200 mb-4">Bu alan, seçili öğrenci için öğretmen tarafından bırakılan not veya mesaj içindir.</p>
+    <div class="space-y-3">
+      <textarea id="tsr-teacher-msg-input" class="w-full p-3 rounded-lg dark-input min-h-[120px]" placeholder="Mesajınızı yazın..."></textarea>
+      <button id="tsr-teacher-msg-save" class="bg-purple-600 hover:bg-purple-700 text-white font-medium py-2.5 px-4 rounded-lg transition">Kaydet</button>
+    </div>
+    <div class="mt-6">
+      <h3 class="text-lg font-semibold text-purple-300 mb-2">Son Mesaj</h3>
+      <div id="tsr-teacher-msg-view" class="bg-black bg-opacity-20 rounded-xl p-4 border border-white border-opacity-10 text-gray-200">
+        Henüz mesaj yok.
+      </div>
+    </div>
+  </div>
 </div>
 <div>
 <div class="student-detail-tab-content" id="tsr-gunluk-rapor">
@@ -1248,8 +1259,8 @@ document.getElementById('tsr-envelope-btn')?.addEventListener('click', () => {
 
         // --- Yardımcı Fonksiyonlar ---
 
-        function showNotification(message, type = 'success', duration = 1500) {
-  duration = 1500;
+        function showNotification(message, type = 'success', duration = 1000) {
+  duration = 1000;
             const box = document.createElement('div');
             let colorClass = (type === 'success') ? 'bg-green-600' : (type === 'error') ? 'bg-red-600' : 'bg-blue-600';
             
@@ -1257,11 +1268,11 @@ document.getElementById('tsr-envelope-btn')?.addEventListener('click', () => {
             box.textContent = message;
             box.style.pointerEvents = 'auto';
 // Yeşil (success) ve mavi (info) uyarıları sayfanın ortasına getir
-if (type === 'success' || type === 'info' || type === 'error') {
+if (type === 'success' || type === 'info') {
   box.style.position = 'fixed';
-  box.style.top = '50%';
+  box.style.top = '1rem';
   box.style.left = '50%';
-  box.style.transform = 'translate(-50%, -50%)';
+  box.style.transform = 'translateX(-50%)';
   box.style.right = 'auto';
   box.style.textAlign = 'center';
   box.style.minWidth = 'min(90vw, 420px)';
@@ -3198,6 +3209,57 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 })();
+
+// === ÖĞRETMEN MESAJI SEKME MANTIĞI (Yerel - localStorage) ===
+(function(){
+  function keyForStudent(id){ return 'tsr_teacher_msg_' + (id || 'unknown'); }
+  function renderTeacherMsg(){
+    try {
+      var view = document.getElementById('tsr-teacher-msg-view');
+      if(!view) return;
+      var sid = (typeof currentStudentId !== 'undefined') ? currentStudentId : null;
+      var raw = localStorage.getItem(keyForStudent(sid));
+      if(!raw){ view.textContent = 'Henüz mesaj yok.'; return; }
+      var obj = JSON.parse(raw);
+      var d = new Date(obj.at || Date.now());
+      var who = (typeof currentUserName !== 'undefined' && currentUserName) ? currentUserName : 'Öğretmen';
+      view.innerHTML = '<div class="text-sm text-gray-300 mb-2">' + d.toLocaleString('tr-TR') + ' - ' + who + '</div>' +
+                       '<div class="whitespace-pre-wrap">' + (obj.text || '') + '</div>';
+    } catch(e){ console.warn('Mesaj görüntüleme hatası:', e); }
+  }
+  function attachHandlers(){
+    var btn = document.getElementById('tsr-teacher-msg-save');
+    var ta = document.getElementById('tsr-teacher-msg-input');
+    if(btn && ta){
+      btn.addEventListener('click', function(){
+        var t = (ta.value || '').trim();
+        if(!t){ showNotification('Lütfen bir mesaj yazın.', 'info'); return; }
+        try {
+          var payload = { text: t, by: (typeof currentUserName !== 'undefined' ? currentUserName : ''), at: new Date().toISOString() };
+          var sid = (typeof currentStudentId !== 'undefined') ? currentStudentId : null;
+          localStorage.setItem(keyForStudent(sid), JSON.stringify(payload));
+          showNotification('Mesaj kaydedildi.', 'success');
+          renderTeacherMsg();
+        } catch(e){
+          console.warn(e); showNotification('Mesaj kaydedilemedi.', 'error');
+        }
+      });
+    }
+    // Sekme butonuna tıklanınca veriyi yenile
+    var tabBtn = document.querySelector('.student-detail-tab-button[data-tab="tsr-ogretmen-mesaji"]');
+    if(tabBtn){
+      tabBtn.addEventListener('click', function(){ setTimeout(renderTeacherMsg, 50); });
+    }
+    // Modal açılmış olabilir; kısa gecikmeyle bir kez render et
+    setTimeout(renderTeacherMsg, 150);
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', attachHandlers);
+  } else {
+    attachHandlers();
+  }
+})();
+
 </script>
 </body>
 </html>
