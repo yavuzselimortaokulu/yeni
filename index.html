@@ -379,11 +379,8 @@
 <input class="w-full p-2.5 rounded-lg dark-input" id="reg-ad" placeholder="Ad" required="" type="text"/>
 <input class="w-full p-2.5 rounded-lg dark-input" id="reg-soyad" placeholder="Soyad" required="" type="text"/>
 <select class="w-full p-2.5 rounded-lg dark-input" id="sinif-select-register" required="">
-<option style="color: #000;" value="">Sınıfınızı Seçin...</option>
-<option style="color: #000;" value="5-A">5-A</option>
-<option style="color: #000;" value="5-B">5-B</option>
-<option style="color: #000;" value="8-C">8-C</option>
-</select>
+    <option value="" selected disabled>Sınıfınızı Seçin</option>
+  </select>
 <input class="w-full p-2.5 rounded-lg dark-input" id="reg-sifre" placeholder="Şifre" required="" type="password"/>
 <input class="w-full p-2.5 rounded-lg dark-input" id="reg-sifre-tekrar" placeholder="Şifre Tekrar" required="" type="password"/>
 <button class="w-full bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 font-medium transition duration-150 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-purple-900" type="submit">
@@ -2012,7 +2009,9 @@ if (weeklyDetailsBodyEl.children.length === 0) {
         document.addEventListener('DOMContentLoaded', function() {
 
             showScreen('auth-page');
-            setupTeacherPanel(); // YENİ: Öğretmen paneli dinleyicilerini kur
+            setupTeacherPanel();
+            // Sınıf listesi: kayıt dropdown'u ile senkron (öğretmen paneli açılmasa bile)
+            try { subscribeClassList(); } catch(e) {} // YENİ: Öğretmen paneli dinleyicilerini kur
 
             // --- İSTEK 3: Kayıtlı bilgileri yükle (BURAYA EKLENDİ) ---
             function loadSavedCredentials() {
@@ -2311,6 +2310,32 @@ if (weeklyDetailsBodyEl.children.length === 0) {
 let studentsByClass = {};
 let teacherFavorites = {};
 let allStudentsMap = {};
+
+// === REGISTER DROPDOWN SYNC (Auth sayfasındaki "Sınıfınızı Seçin") ===
+let classListSubscribed = false;
+
+/** Mevcut sınıfları kayıt ekranındaki açılır menüye aktarır */
+function populateRegistrationClassSelect() {
+  var select = document.getElementById('sinif-select-register');
+  if (!select) return;
+  // Son seçimi koru (varsa)
+  var prev = select.value || '';
+  // Placeholder
+  select.innerHTML = '<option value="" selected disabled>Sınıfınızı Seçin</option>';
+  // classList globalinden doldur
+  if (Array.isArray(classList) && classList.length > 0) {
+    classList.forEach(function(sinifAdi){
+      var opt = document.createElement('option');
+      opt.value = sinifAdi;
+      opt.textContent = sinifAdi;
+      select.appendChild(opt);
+    });
+  }
+  // Geçerli değer listede ise geri yükle
+  if (prev && classList.indexOf(prev) !== -1) {
+    select.value = prev;
+  }
+}
 const CLASSLIST_PATH = 'system/siniflar';
 let classList = [];
 const FAVORITES_PATH = 'system/favorites';
@@ -2368,11 +2393,15 @@ function subscribeStudents() {
 }
 
 function subscribeClassList() {
+    if (classListSubscribed) { /* zaten abone */ return; }
+  classListSubscribed = true;
   database.ref(CLASSLIST_PATH).on('value', function(snap) {
     var obj = snap.val() || {};
     classList = Object.keys(obj).sort();
 
-    // Öğretmen paneli "Sınıflar" sekmesini yeniden çiz
+    
+    try { populateRegistrationClassSelect(); } catch (e) { console.warn('Dropdown sync hata:', e); }
+// Öğretmen paneli "Sınıflar" sekmesini yeniden çiz
     if (typeof window.renderTeacherClassList === 'function') {
       window.renderTeacherClassList();
     }
