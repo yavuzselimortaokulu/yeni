@@ -941,7 +941,7 @@ document.getElementById('tsr-envelope-btn')?.addEventListener('click', () => {
 </div>
 <div class="flex items-center space-x-4">
 <div class="text-right text-sm">
-<div class="font-medium text-white" id="teacher-welcome-name">Öğretmen: ...</div>
+<div class="font-medium text-white hidden" id="teacher-welcome-name">Öğretmen: ...</div>
 <div class="text-gray-300" id="teacher-welcome-role">Yönetici</div>
 </div>
 <button class="bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-2 px-3 rounded-lg transition duration-150 flex items-center space-x-1" id="teacher-logout-button">
@@ -955,7 +955,7 @@ document.getElementById('tsr-envelope-btn')?.addEventListener('click', () => {
 <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
 <div class="mb-6">
 <h1 class="text-3xl font-bold text-white shadow-sm">Sınıf Yönetimi</h1>
-<p class="text-lg text-gray-300">Öğrenci ilerlemelerini takip edin ve ayarları yönetin.</p>
+<p class="text-lg text-gray-300" id="teacher-welcome-name-below">Öğretmen: ...</p>
 </div>
 <div class="flex flex-wrap gap-2 bg-transparent bg-opacity-20 border border-white border-opacity-20 rounded-lg p-1 mb-6 max-w-xl" style="background: linear-gradient(135deg, #411d6e 0%, #4d2281 50%, #55258e 100%) !important;">
 <button class="teacher-panel-tab-button panel-tab-button flex-auto text-sm font-medium py-2 px-3 rounded-md" data-tab="teacher-genel-ozet">Genel Özet</button>
@@ -1011,12 +1011,20 @@ document.getElementById('tsr-envelope-btn')?.addEventListener('click', () => {
 <div class="panel-tab-content" id="teacher-siniflar">
 <div class="bg-transparent bg-opacity-20 backdrop-blur-lg rounded-2xl shadow-2xl p-6 border border-white border-opacity-20" style="background: linear-gradient(135deg, #411d6e 0%, #4d2281 50%, #55258e 100%) !important;">
 <h2 class="text-2xl font-bold mb-5 text-purple-300">Sınıfları Yönet</h2>
-<div class="flex gap-4 mb-6">
-<input class="dark-input flex-grow p-2.5 rounded-lg" id="sinif-ekle-input" placeholder="Yeni sınıf adı (örn: 6-C)" type="text"/>
-<button class="bg-purple-600 hover:bg-purple-700 text-white font-medium py-2.5 px-6 rounded-lg transition-all flex items-center space-x-2" id="sinif-ekle-buton">
-<ion-icon class="text-xl" name="add-circle-outline"></ion-icon>
-<span>Ekle</span>
-</button>
+<div class="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6">
+  <input
+    id="sinif-ekle-input"
+    type="text"
+    placeholder="Yeni sınıf adı (örn: 6-C)"
+    class="dark-input flex-grow p-2.5 rounded-lg min-w-0"
+  />
+  <button
+    id="sinif-ekle-buton"
+    class="bg-purple-600 hover:bg-purple-700 text-white font-medium py-2.5 px-6 rounded-lg transition-all flex items-center justify-center space-x-2 w-full sm:w-auto"
+  >
+    <ion-icon class="text-xl" name="add-circle-outline"></ion-icon>
+    <span>Ekle</span>
+  </button>
 </div>
 <div class="text-red-400 text-sm mb-4 hidden" id="sinif-hata-mesaji"></div>
 <div class="">
@@ -1320,7 +1328,9 @@ document.getElementById('tsr-envelope-btn')?.addEventListener('click', () => {
                     currentUserName = userData.adSoyad;
                     currentUserRole = 'ogretmen';
                     
-                    document.getElementById('teacher-welcome-name').textContent = `Öğretmen: ${currentUserName}`;
+                    document.getElementById('teacher-welcome-name').textContent = `Öğretmen: ${toTitleCaseTR(currentUserName)}`;
+                    const tBelow = document.getElementById('teacher-welcome-name-below');
+                    if (tBelow) tBelow.textContent = `Öğretmen: ${toTitleCaseTR(currentUserName)}`;
                     
                     document.getElementById('teacher-panel').classList.remove('hidden');
                     subscribeClassList();
@@ -2963,6 +2973,25 @@ document.addEventListener('DOMContentLoaded', function () {
     if (s) { s.style.background = grad; }
   });
 </script>
+
+<script>
+  function toTitleCaseTR(str) {
+    if (!str) return '';
+    return String(str)
+      .trim()
+      .split(/\s+/)
+      .map(function(word){
+        return word.split('-').map(function(seg){
+          if (!seg) return seg;
+          var first = seg.charAt(0).toLocaleUpperCase('tr-TR');
+          var rest  = seg.slice(1).toLocaleLowerCase('tr-TR');
+          return first + rest;
+        }).join('-');
+      })
+      .join(' ');
+  }
+</script>
+
 </body>
 </html>
 
