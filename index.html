@@ -344,56 +344,46 @@
   }
 </style>
 
-<style id="parent-ders-mobile-card-styles">
-  /* Mobile-only card for Derslere Göre Dağılım (Aylık Ders Dökümü görünümü) */
-  @media (max-width: 640px){
-    #parent-ders-mobile-card{
-      background: linear-gradient(135deg, #411d6e 0%, #4d2281 50%, #55258e 100%) !important;
-      border: 1px solid rgba(255,255,255,0.18);
-      border-radius: 16px;
-      overflow: hidden;
-    }
-    #parent-ders-mobile-card .mobile-card-header{
-      padding: 14px 16px;
-      font-weight: 700;
-      font-size: 1.125rem;
-      color: #ffffff;
-      background: rgba(255,255,255,0.06);
-      border-bottom: 1px solid rgba(255,255,255,0.12);
-    }
-    #parent-ders-mobile-card .mobile-card-table{
+<style id="parent-table-mobile-fit">
+  /* Veli paneli - Genel sekme: mobil "Aylık Ders Dökümü" formu */
+  @media (max-width: 430px) {
+    #parent-ders-tablosu {
+      table-layout: fixed;
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.9rem;
     }
-    #parent-ders-mobile-card .mobile-head{
-      display: grid;
-      grid-template-columns: 1.2fr .9fr .7fr .7fr .9fr;
-      gap: 8px;
-      padding: 10px 14px;
-      color: #c7b7ff;
-      text-transform: uppercase;
-      font-weight: 600;
-      font-size: 0.72rem;
-      letter-spacing: .02em;
-      border-bottom: 1px solid rgba(255,255,255,0.12);
+    #parent-ders-tablosu thead th {
+      padding: 8px 6px !important;
+      white-space: normal !important;
+      word-break: break-word;
+      letter-spacing: 0.02em;
+      font-size: 0.82rem;
+      line-height: 1.05;
     }
-    #parent-ders-mobile-card .mobile-row{
-      display: grid;
-      grid-template-columns: 1.2fr .9fr .7fr .7fr .9fr;
-      gap: 8px;
-      align-items: center;
-      padding: 12px 14px;
-      border-bottom: 1px dashed rgba(255,255,255,0.12);
+    #parent-ders-tablosu td {
+      padding: 10px 8px !important;
+      white-space: normal !important;
+      word-break: break-word;
+      font-size: 0.95rem;
+      line-height: 1.1;
     }
-    #parent-ders-mobile-card .mobile-row:last-child{
-      border-bottom: none;
+    /* İki satırda ders adı */
+    #parent-ders-tablosu .ders-adi {
+      width: 42%;
+      font-size: 0.98rem;
+      line-height: 1.1;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      hyphens: auto;
+      word-break: break-word;
     }
-    #parent-ders-mobile-card .cell-subject{ color:#fff; font-weight:600; }
-    #parent-ders-mobile-card .cell-total{ text-align:center; font-weight:700; }
-    #parent-ders-mobile-card .cell-correct{ text-align:center; }
-    #parent-ders-mobile-card .cell-wrong{ text-align:center; }
-    #parent-ders-mobile-card .cell-success{ text-align:right; font-weight:800; }
+    #parent-ders-tablosu .ders-toplam,
+    #parent-ders-tablosu .ders-dogru,
+    #parent-ders-tablosu .ders-yanlis { width: 14%; text-align: center; }
+    #parent-ders-tablosu .ders-basari { width: 16%; text-align: center; }
   }
 </style>
 
@@ -787,8 +777,8 @@
 <div class="lg:col-span-3">
 <div class="bg-transparent bg-opacity-20 backdrop-blur-lg rounded-2xl shadow-xl border border-white border-opacity-20 overflow-hidden" style="background: linear-gradient(135deg, #411d6e 0%, #4d2281 50%, #55258e 100%) !important;">
 <h3 class="text-xl font-semibold text-white p-6 border-b border-white border-opacity-10">Derslere Göre Dağılım</h3>
-<div class="overflow-x-auto">
-<table class="w-full min-w-full">
+<div class="overflow-x-hidden">
+<table id="parent-ders-tablosu" class="w-full">
 <thead class="bg-white bg-opacity-10">
 <tr>
 <th class="py-3 px-6 text-left text-sm font-medium text-gray-300 uppercase tracking-wider">Ders Adı</th>
@@ -809,16 +799,7 @@
 
 </div>
 
-<!-- MOBILE PATCH: Ders dağılımı donut + AI özet -->
-<div class="sm:hidden grid grid-cols-1 gap-4" id="parent-genel-mobile-block">
-  <div class="bg-transparent bg-opacity-20 backdrop-blur-lg rounded-2xl shadow-xl border border-white border-opacity-20 overflow-hidden"
-       style="background: linear-gradient(135deg, #411d6e 0%, #4d2281 50%, #55258e 100%) !important;">
-    <h3 class="text-lg font-semibold text-white p-4 border-b border-white border-opacity-10">
-      Ders Dağılımı (Özet)
-    </h3>
-    <div class="p-4">
-      <canvas id="parent-genel-donut-canvas" height="220"></canvas>
-    </div>
+<!-- MOBILE PATCH: removed donut card as requested --><div id="parent-genel-mobile-block" class="sm:hidden grid grid-cols-1 gap-4">
   </div>
 
   <!-- AI özet butonu -->
@@ -827,20 +808,6 @@
     Yapay Zeka Özeti
   </button>
 </div>
-
-  <!-- MOBILE: Aylık Ders Dökümü (Derslere Göre Dağılım görünümü) -->
-  <div id="parent-ders-mobile-card" class="sm:hidden">
-    <div class="mobile-card-header">Aylık Ders Dökümü</div>
-    <div class="mobile-head">
-      <div>Ders</div>
-      <div class="text-center">Toplam</div>
-      <div class="text-center">Doğru</div>
-      <div class="text-center">Yanlış</div>
-      <div class="text-right">Başarı</div>
-    </div>
-    <div id="parent-ders-mobile-body"></div>
-  </div>
-
 <!-- /MOBILE PATCH -->
 </div>
 <div class="panel-tab-content" id="parent-gunluk-rapor">
@@ -1650,35 +1617,6 @@ function updateStatistics() {
                     tbody.appendChild(row);
                 }
             });
-
-            // --- MOBILE CARD POPULATION (Aylık Ders Dökümü görünümü) ---
-            (function populateMobileCard(){
-                const container = document.getElementById('parent-ders-mobile-body');
-                if(!container) return;
-                container.innerHTML = '';
-                // Her dersi göster (0'lar dahil)
-                allSubjectsFull.forEach(subjectName => {
-                    const data = subjectTotals[subjectName] || { d: 0, y: 0, total: 0 };
-                    const total = data.total || 0;
-                    const successRate = total > 0 ? Math.round((data.d / total) * 100) : 0;
-                    // Renk sınıfları
-                    const sClass = total === 0 ? 'text-gray-400' : (successRate >= 85 ? 'text-green-400' : (successRate >= 70 ? 'text-yellow-400' : 'text-yellow-300'));
-                    const cClass = total === 0 ? 'text-gray-400' : 'text-green-400';
-                    const wClass = total === 0 ? 'text-gray-400' : 'text-red-400';
-                    const tClass = total === 0 ? 'text-gray-400' : 'text-purple-200';
-                    const row = document.createElement('div');
-                    row.className = 'mobile-row';
-                    row.innerHTML = `
-                        <div class="cell-subject">${subjectName}</div>
-                        <div class="cell-total ${tClass}">${total}</div>
-                        <div class="cell-correct ${cClass}">${data.d || 0}</div>
-                        <div class="cell-wrong ${wClass}">${data.y || 0}</div>
-                        <div class="cell-success ${sClass}">${total > 0 ? successRate + '%' : '-'}</div>
-                    `;
-                    container.appendChild(row);
-                });
-            })();
-
             if (!hasData) {
                 tbody.innerHTML = '<tr><td colspan="5" class="py-4 px-6 text-center text-gray-400">Çocuğunuz bu ay henüz soru çözümü kaydetmedi.</td></tr>';
             }
