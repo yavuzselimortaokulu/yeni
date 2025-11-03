@@ -345,35 +345,45 @@
 </style>
 
 <style id="parent-table-mobile-fit">
-  /* Veli paneli - Genel sekme: 'Derslere Göre Dağılım' tablosu
-     - Yatay kaydırma yok
-     - Yazı boyutu küçülterek ve satır kırarak sığdır
-  */
+  /* Veli paneli - Genel sekme: mobil "Aylık Ders Dökümü" formu */
   @media (max-width: 430px) {
     #parent-ders-tablosu {
-      table-layout: auto !important;   /* içerik uyumlu dağılım */
+      table-layout: fixed;
       width: 100%;
       border-collapse: collapse;
     }
-    #parent-ders-tablosu th,
-    #parent-ders-tablosu td {
-      padding: 6px 4px !important;     /* daha sıkı hücreler */
-      line-height: 1.1 !important;
-      white-space: normal !important;  /* tek satıra zorlamayı kaldır */
-      overflow-wrap: anywhere !important; /* uzun kelimeleri kır */
+    #parent-ders-tablosu thead th {
+      padding: 8px 6px !important;
+      white-space: normal !important;
       word-break: break-word;
-      text-overflow: clip !important;
-      font-size: clamp(10px, 2.9vw, 12px) !important; /* ekrana göre küçült */
+      letter-spacing: 0.02em;
+      font-size: 0.82rem;
+      line-height: 1.05;
     }
-    /* Sütun oranları: ders adına daha çok alan */
-    #parent-ders-tablosu .ders-adi { width: 44% !important; }
+    #parent-ders-tablosu td {
+      padding: 10px 8px !important;
+      white-space: normal !important;
+      word-break: break-word;
+      font-size: 0.95rem;
+      line-height: 1.1;
+    }
+    /* İki satırda ders adı */
+    #parent-ders-tablosu .ders-adi {
+      width: 42%;
+      font-size: 0.98rem;
+      line-height: 1.1;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      hyphens: auto;
+      word-break: break-word;
+    }
     #parent-ders-tablosu .ders-toplam,
     #parent-ders-tablosu .ders-dogru,
-    #parent-ders-tablosu .ders-yanlis,
-    #parent-ders-tablosu .ders-basari {
-      width: 14% !important;
-      text-align: center;
-    }
+    #parent-ders-tablosu .ders-yanlis { width: 14%; text-align: center; }
+    #parent-ders-tablosu .ders-basari { width: 16%; text-align: center; }
   }
 </style>
 
@@ -789,12 +799,14 @@
 
 </div>
 
-<!-- MOBILE PATCH: removed donut card as requested -->
+<!-- MOBILE PATCH: removed donut card as requested --><div id="parent-genel-mobile-block" class="sm:hidden grid grid-cols-1 gap-4">
   </div>
 
-  
-  <!-- removed mobile cards as requested --></div>
-
+  <!-- AI özet butonu -->
+  <button id="getGeminiSummary"
+          class="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-4 rounded-xl transition">
+    Yapay Zeka Özeti
+  </button>
 </div>
 <!-- /MOBILE PATCH -->
 </div>
@@ -1610,7 +1622,6 @@ function updateStatistics() {
             }
         }
         
-        
         function renderAllPanels() {
             if (currentUserRole === 'ogrenci') {
                 const activeTabId = document.querySelector('.student-panel-tab-button.bg-purple-600')?.dataset.tab || 'soru-girisi';
@@ -1619,9 +1630,7 @@ function updateStatistics() {
                 else if (activeTabId === 'aylik-rapor') setupMonthlyReport('student');
             } else if (currentUserRole === 'veli') {
                 const activeTabId = document.querySelector('.parent-panel-tab-button.bg-purple-600')?.dataset.tab || 'parent-genel-ozet';
-                if (activeTabId === 'parent-genel-ozet') { renderParentSummaryTable();                 renderParentDonutChartWithTotals(getSubjectTotals());
-                renderParentSummaryCardsWithTotals(getSubjectTotals());
-} 
+                if (activeTabId === 'parent-genel-ozet') { renderParentSummaryTable(); } 
                 else if (activeTabId === 'parent-gunluk-rapor') { setupCalendar('parent'); } 
                 else if (activeTabId === 'parent-haftalik-rapor') { setupWeeklyReport('parent'); } 
                 else if (activeTabId === 'parent-aylik-rapor') { setupMonthlyReport('parent'); }
@@ -3336,34 +3345,6 @@ document.addEventListener('DOMContentLoaded', function () {
 })();
 
 </script>
-
-<script id="remove-ai-summary">
-document.addEventListener('DOMContentLoaded', function () {
-  const root = document.querySelector('#parent-genel-ozet') || document;
-  // Try by heading text
-  const headings = Array.from(root.querySelectorAll('h1,h2,h3,h4'));
-  const h = headings.find(el => /yapay\s*zeka\s*özet|ai\s*özet/i.test((el.textContent||'').toLowerCase()));
-  if (h) {
-    let container = h.closest('div');
-    let hops = 0;
-    while (container && hops < 6) {
-      if (container.matches('.rounded-2xl, .card, [class*="rounded"], [class*="border"], [class*="shadow"], section, article')) break;
-      container = container.parentElement;
-      hops++;
-    }
-    if (container) container.remove();
-  }
-  // Remove any AI summary toggle/button
-  const buttons = Array.from(root.querySelectorAll('button, a'));
-  buttons.forEach(btn => {
-    const t = (btn.textContent||'').toLowerCase();
-    if (/yapay\s*zeka\s*özet|ai\s*özet/.test(t) || (btn.id||'').toLowerCase().includes('ai') ) {
-      btn.remove();
-    }
-  });
-});
-</script>
-
 </body>
 </html>
 <!-- PATCH: Günlük Rapor Takvimi — Sıkı Yerleşim (v3, responsive) -->
