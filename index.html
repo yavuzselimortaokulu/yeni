@@ -343,6 +343,36 @@
     #getGeminiSummary { min-height: 48px; }
   }
 </style>
+
+<style id="parent-mobile-cards">
+  /* Veli paneli: mobil ders kartları */
+  #parent-ders-cards-block .card {
+    background: rgba(0,0,0,0.18);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 16px;
+    padding: 12px;
+  }
+  #parent-ders-cards-block .card .title {
+    font-weight: 600;
+    color: #ffffff;
+  }
+  #parent-ders-cards-block .stat {
+    font-size: 0.9rem;
+  }
+  #parent-ders-cards-block .bar {
+    height: 8px;
+    border-radius: 9999px;
+    background: rgba(255,255,255,0.15);
+    overflow: hidden;
+  }
+  #parent-ders-cards-block .bar > span {
+    display: block;
+    height: 100%;
+    border-radius: 9999px;
+    background: linear-gradient(90deg, #a78bfa, #c084fc);
+  }
+</style>
+
 </head>
 <body class="bg-gradient-to-br from-indigo-800 via-purple-800 to-indigo-900 text-white min-h-screen">
 <div class="space-y-2" id="notification-box"></div>
@@ -765,6 +795,17 @@
     <div class="p-4">
       <canvas id="parent-genel-donut-canvas" height="220"></canvas>
     </div>
+  </div>
+
+  
+  <!-- Mobil ders kartları -->
+  <div id="parent-ders-cards-block"
+       class="bg-transparent bg-opacity-20 backdrop-blur-lg rounded-2xl shadow-xl border border-white border-opacity-20 overflow-hidden"
+       style="background: linear-gradient(135deg, #411d6e 0%, #4d2281 50%, #55258e 100%) !important;">
+    <h3 class="text-lg font-semibold text-white p-4 border-b border-white border-opacity-10">
+      Derslere Göre Dağılım (Mobil)
+    </h3>
+    <div id="parent-ders-cards-container" class="p-4 space-y-3"></div>
   </div>
 
   <!-- AI özet butonu -->
@@ -1237,6 +1278,16 @@
             'Sosyal Bilgiler': 'Sos', 'İngilizce': 'İng', 'Din Kültürü': 'Din'
         };
         const allSubjectsFull = Object.keys(allSubjectsMap);
+        // Renkli donut için ders-renk eşleşmesi
+        const subjectColorMap = {
+            'Matematik': '#a78bfa',   // purple-300
+            'Türkçe': '#f472b6',      // pink-400
+            'Fen Bilimleri': '#60a5fa', // blue-400
+            'Sosyal Bilgiler': '#34d399', // emerald-400
+            'İngilizce': '#fbbf24',   // yellow-400
+            'Din Kültürü': '#f87171'  // red-400
+        };
+
         const daysOfWeekShort = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
         const monthNames = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
 
@@ -1587,6 +1638,96 @@ function updateStatistics() {
             }
         }
         
+        
+        // === Veli paneli: Ders toplamları yardımcıları ===
+        function getSubjectTotals(){
+            const totals = {};
+            for (const dateKey in allQuestionEntries) {
+                const dailyData = allQuestionEntries[dateKey];
+                for (const subject in dailyData) {
+                    const entry = dailyData[subject];
+                    if (!totals[subject]) totals[subject] = { d: 0, y: 0, total: 0 };
+                    totals[subject].d += entry.d;
+                    totals[subject].y += entry.y;
+                    totals[subject].total += (entry.d + entry.y);
+                }
+            }
+            // Tüm dersleri sıfırla da olsa göstermek için eksikleri 0'la doldur
+            allSubjectsFull.forEach(s => {
+                if (!totals[s]) totals[s] = { d: 0, y: 0, total: 0 };
+            });
+            return totals;
+        }
+
+        let parentDonutChartInstance = null;
+
+        function renderParentDonutChartWithTotals(subjectTotals){
+            const canvas = document.getElementById('parent-genel-donut-canvas');
+            if(!canvas) return;
+            const labels = [], values = [], colors = [];
+            allSubjectsFull.forEach(s => {
+                labels.push(allSubjectsMap[s]);
+                values.push((subjectTotals[s] || {total:0}).total);
+                colors.push(subjectColorMap[s] || '#a78bfa');
+            });
+            // Eski grafik varsa temizle
+            try { if (parentDonutChartInstance) parentDonutChartInstance.destroy(); } catch(e){}
+            const ctx = canvas.getContext('2d');
+            if(!ctx) return;
+            parentDonutChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'Toplam Soru',
+                        data: values,
+                        backgroundColor: colors,
+                        borderColor: 'rgba(0,0,0,0.2)',
+                        borderWidth: 1,
+                        hoverOffset: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '60%',
+                    plugins: {
+                        legend: { labels: { color: '#e5e7eb' } },
+                        tooltip: { callbacks: {
+                            label: (ctx) => ` ${ctx.label}: ${ctx.parsed} soru`
+                        } }
+                    }
+                }
+            });
+        }
+
+        function renderParentSummaryCardsWithTotals(subjectTotals){
+            const container = document.getElementById('parent-ders-cards-container');
+            if(!container) return;
+            let htmlCards = '';
+            allSubjectsFull.forEach(s => {
+                const data = subjectTotals[s] || {d:0, y:0, total:0};
+                const rate = data.total > 0 ? Math.round((data.d / data.total) * 100) : 0;
+                const rateStr = data.total > 0 ? rate + '%' : '-';
+                const barWidth = data.total > 0 ? rate : 0;
+                htmlCards += `
+                  <div class="card">
+                    <div class="flex items-center justify-between mb-1">
+                      <span class="title">${s}</span>
+                      <span class="text-sm text-purple-200 font-medium">${data.total} soru</span>
+                    </div>
+                    <div class="flex items-center justify-between text-gray-200 stat mb-1">
+                      <span class="text-green-400">D: ${data.d}</span>
+                      <span class="text-red-400">Y: ${data.y}</span>
+                      <span class="${data.total>0?(rate>=80?'text-green-400':(rate>=60?'text-yellow-300':'text-red-400')):'text-gray-400'} font-medium">Başarı: ${rateStr}</span>
+                    </div>
+                    <div class="bar"><span style="width:${barWidth}%;"></span></div>
+                  </div>
+                `;
+            });
+            container.innerHTML = htmlCards;
+        }
+
         function renderAllPanels() {
             if (currentUserRole === 'ogrenci') {
                 const activeTabId = document.querySelector('.student-panel-tab-button.bg-purple-600')?.dataset.tab || 'soru-girisi';
@@ -1595,7 +1736,9 @@ function updateStatistics() {
                 else if (activeTabId === 'aylik-rapor') setupMonthlyReport('student');
             } else if (currentUserRole === 'veli') {
                 const activeTabId = document.querySelector('.parent-panel-tab-button.bg-purple-600')?.dataset.tab || 'parent-genel-ozet';
-                if (activeTabId === 'parent-genel-ozet') { renderParentSummaryTable(); } 
+                if (activeTabId === 'parent-genel-ozet') { renderParentSummaryTable();                 renderParentDonutChartWithTotals(getSubjectTotals());
+                renderParentSummaryCardsWithTotals(getSubjectTotals());
+} 
                 else if (activeTabId === 'parent-gunluk-rapor') { setupCalendar('parent'); } 
                 else if (activeTabId === 'parent-haftalik-rapor') { setupWeeklyReport('parent'); } 
                 else if (activeTabId === 'parent-aylik-rapor') { setupMonthlyReport('parent'); }
