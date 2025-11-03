@@ -3152,6 +3152,34 @@ document.addEventListener('DOMContentLoaded', function () {
 (function(){
   // Singleton chart
   let parentDonutChart = null;
+  
+  // == MOBILE PATCH: ders isimlerini mobilde kısalt ==
+  function applyParentTableShortNames(){
+    try {
+      const isMobile = (window.matchMedia && window.matchMedia('(max-width: 430px)').matches);
+      const nodes = document.querySelectorAll('#parent-ders-tablosu-body .ders-adi');
+      nodes.forEach(td => {
+        const full = (td.dataset && td.dataset.fullName) ? td.dataset.fullName : (td.textContent || '').trim();
+        if (td.dataset) td.dataset.fullName = full;
+        let shortName = full;
+        if (isMobile) {
+          // Varsa platformun kısa ad haritasını kullan
+          if (window.allSubjectsMap && window.allSubjectsMap[full]) {
+            shortName = window.allSubjectsMap[full];
+          } else {
+            // Basit yedek: sesli harfleri ayıkla + 3-4 karaktere indir
+            shortName = full.replace(/[aeıioöuüAEIİOÖUÜ\s\.]/g,'').slice(0,4) || full.slice(0,4);
+          }
+        }
+        td.textContent = shortName;
+      });
+    } catch(e) {}
+  }
+  
+  // Boyut değişimlerinde yeniden uygula
+  window.addEventListener('resize', () => { try { applyParentTableShortNames(); } catch(e){} });
+  window.addEventListener('orientationchange', () => { try { applyParentTableShortNames(); } catch(e){} });
+
 
   function deriveSubjectTotalsFromDOM(){
     const map = {};
