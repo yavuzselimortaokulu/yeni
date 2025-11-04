@@ -343,50 +343,6 @@
     #getGeminiSummary { min-height: 48px; }
   }
 </style>
-
-<style id="parent-table-mobile-fit">
-  /* Veli paneli - Genel sekme: mobil "Aylık Ders Dökümü" formu */
-  @media (max-width: 430px) {
-    #parent-ders-tablosu {
-      table-layout: fixed;
-      width: 100%;
-      border-collapse: collapse;
-    }
-    #parent-ders-tablosu thead th {
-      padding: 8px 6px !important;
-      white-space: normal !important;
-      word-break: break-word;
-      letter-spacing: 0.02em;
-      font-size: 0.82rem;
-      line-height: 1.05;
-    }
-    #parent-ders-tablosu td {
-      padding: 10px 8px !important;
-      white-space: normal !important;
-      word-break: break-word;
-      font-size: 0.95rem;
-      line-height: 1.1;
-    }
-    /* İki satırda ders adı */
-    #parent-ders-tablosu .ders-adi {
-      width: 42%;
-      font-size: 0.98rem;
-      line-height: 1.1;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      hyphens: auto;
-      word-break: break-word;
-    }
-    #parent-ders-tablosu .ders-toplam,
-    #parent-ders-tablosu .ders-dogru,
-    #parent-ders-tablosu .ders-yanlis { width: 14%; text-align: center; }
-    #parent-ders-tablosu .ders-basari { width: 16%; text-align: center; }
-  }
-</style>
-
 </head>
 <body class="bg-gradient-to-br from-indigo-800 via-purple-800 to-indigo-900 text-white min-h-screen">
 <div class="space-y-2" id="notification-box"></div>
@@ -777,8 +733,8 @@
 <div class="lg:col-span-3">
 <div class="bg-transparent bg-opacity-20 backdrop-blur-lg rounded-2xl shadow-xl border border-white border-opacity-20 overflow-hidden" style="background: linear-gradient(135deg, #411d6e 0%, #4d2281 50%, #55258e 100%) !important;">
 <h3 class="text-xl font-semibold text-white p-6 border-b border-white border-opacity-10">Derslere Göre Dağılım</h3>
-<div class="overflow-x-hidden">
-<table id="parent-ders-tablosu" class="w-full">
+<div class="overflow-x-auto">
+<table class="w-full min-w-full">
 <thead class="bg-white bg-opacity-10">
 <tr>
 <th class="py-3 px-6 text-left text-sm font-medium text-gray-300 uppercase tracking-wider">Ders Adı</th>
@@ -799,7 +755,16 @@
 
 </div>
 
-<!-- MOBILE PATCH: removed donut card as requested --><div id="parent-genel-mobile-block" class="sm:hidden grid grid-cols-1 gap-4">
+<!-- MOBILE PATCH: Ders dağılımı donut + AI özet -->
+<div class="sm:hidden grid grid-cols-1 gap-4" id="parent-genel-mobile-block">
+  <div class="bg-transparent bg-opacity-20 backdrop-blur-lg rounded-2xl shadow-xl border border-white border-opacity-20 overflow-hidden"
+       style="background: linear-gradient(135deg, #411d6e 0%, #4d2281 50%, #55258e 100%) !important;">
+    <h3 class="text-lg font-semibold text-white p-4 border-b border-white border-opacity-10">
+      Ders Dağılımı (Özet)
+    </h3>
+    <div class="p-4">
+      <canvas id="parent-genel-donut-canvas" height="220"></canvas>
+    </div>
   </div>
 
   <!-- AI özet butonu -->
@@ -3152,34 +3117,6 @@ document.addEventListener('DOMContentLoaded', function () {
 (function(){
   // Singleton chart
   let parentDonutChart = null;
-  
-  // == MOBILE PATCH: ders isimlerini mobilde kısalt ==
-  function applyParentTableShortNames(){
-    try {
-      const isMobile = (window.matchMedia && window.matchMedia('(max-width: 430px)').matches);
-      const nodes = document.querySelectorAll('#parent-ders-tablosu-body .ders-adi');
-      nodes.forEach(td => {
-        const full = (td.dataset && td.dataset.fullName) ? td.dataset.fullName : (td.textContent || '').trim();
-        if (td.dataset) td.dataset.fullName = full;
-        let shortName = full;
-        if (isMobile) {
-          // Varsa platformun kısa ad haritasını kullan
-          if (window.allSubjectsMap && window.allSubjectsMap[full]) {
-            shortName = window.allSubjectsMap[full];
-          } else {
-            // Basit yedek: sesli harfleri ayıkla + 3-4 karaktere indir
-            shortName = full.replace(/[aeıioöuüAEIİOÖUÜ\s\.]/g,'').slice(0,4) || full.slice(0,4);
-          }
-        }
-        td.textContent = shortName;
-      });
-    } catch(e) {}
-  }
-  
-  // Boyut değişimlerinde yeniden uygula
-  window.addEventListener('resize', () => { try { applyParentTableShortNames(); } catch(e){} });
-  window.addEventListener('orientationchange', () => { try { applyParentTableShortNames(); } catch(e){} });
-
 
   function deriveSubjectTotalsFromDOM(){
     const map = {};
