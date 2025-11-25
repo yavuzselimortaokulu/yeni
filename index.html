@@ -360,17 +360,13 @@
 <style id="teacher-genel-mobile-patch">
   /* Öğretmen Paneli → Genel Özet mobil entegrasyonu */
   @media (max-width: 640px){
-    /* KPI ızgarasını mobilde 2 sütuna düşür (çok dar ekranlarda 1 sütun) */
+    /* KPI ızgarasını mobilde HER SATIRA 1 kart gelecek şekilde ayarla */
     #teacher-genel-ozet .grid.mb-6{
       display: grid;
-      grid-template-columns: repeat(2, minmax(0,1fr));
+      grid-template-columns: 1fr;
       gap: 0.75rem !important; /* ~gap-3 */
     }
-    @media (max-width: 380px){
-      #teacher-genel-ozet .grid.mb-6{
-        grid-template-columns: 1fr;
-      }
-    }
+
     /* KPI kartları: padding küçült, tipografi sıkılaştır */
     #teacher-genel-ozet .grid.mb-6 > div{
       padding: 0.875rem !important; /* p-3.5 */
@@ -383,7 +379,7 @@
     #teacher-genel-ozet .grid.mb-6 .text-lg{ font-size: 1rem !important; }
     #teacher-genel-ozet .grid.mb-6 .text-3xl{ font-size: 1.5rem !important; } /* sayılar */
     #teacher-genel-ozet .grid.mb-6 .p-3{ padding: 0.5rem !important; } /* ikon arka planı */
-    
+
     /* Sınıf bar grafiği mobil yükseklik ayarı */
     #teacher-genel-ozet .h-80{
       height: 18rem !important; /* ~288px */
