@@ -172,6 +172,21 @@
     background-color: rgba(255,255,255,0.06) !important;
   }
 </style>
+<style id="student-teacher-msg-modal-purple-gradient">
+  /* Öğrenci paneli → Öğretmen mesajı modalı mor degrade & şeffaf */
+  #studentTeacherMsgModal .modal-content {
+    background: linear-gradient(135deg,
+      rgba(76, 29, 149, 0.94) 0%,
+      rgba(124, 58, 237, 0.92) 45%,
+      rgba(147, 51, 234, 0.90) 100%
+    ) !important;
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.25);
+  }
+  #studentTeacherMsgModal .bg-black.bg-opacity-30{
+    background-color: rgba(0, 0, 0, 0.35);
+  }
+</style>
 <style id="report-tab-container-gradient">
   /* Rapor sekmesi kök kapsayıcılarının (panel-tab-content) arka planını da mor degrade yap */
   #student-panel .panel-tab-content#gunluk-rapor,
@@ -334,7 +349,6 @@
     box-shadow: none !important;
   }
 </style>
-
 <style id="parent-genel-mobile-patch">
   @media (max-width: 640px){
     /* KPI kartları mobilde biraz daha sıkı dursun */
@@ -342,6 +356,131 @@
     /* Donut grafiği kartında tuş hedefleri rahat olsun */
     #getGeminiSummary { min-height: 48px; }
   }
+</style>
+<style id="teacher-genel-mobile-patch">
+  /* Öğretmen Paneli → Genel Özet mobil entegrasyonu */
+  @media (max-width: 640px){
+    /* KPI ızgarasını mobilde 2 sütuna düşür (çok dar ekranlarda 1 sütun) */
+    #teacher-genel-ozet .grid.mb-6{
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 0.75rem !important; /* ~gap-3 */
+    }
+    @media (max-width: 380px){
+      #teacher-genel-ozet .grid.mb-6{
+        grid-template-columns: 1fr;
+      }
+    }
+    /* KPI kartları: padding küçült, tipografi sıkılaştır */
+    #teacher-genel-ozet .grid.mb-6 > div{
+      padding: 0.875rem !important; /* p-3.5 */
+      border-radius: 0.875rem !important; /* ~rounded-2xl'e yakın fakat kompakt */
+    }
+    #teacher-genel-ozet .grid.mb-6 ion-icon{
+      font-size: 1.25rem !important; /* ~text-xl */
+    }
+    #teacher-genel-ozet .grid.mb-6 .text-2xl{ font-size: 1.125rem !important; } /* başlıklar */
+    #teacher-genel-ozet .grid.mb-6 .text-lg{ font-size: 1rem !important; }
+    #teacher-genel-ozet .grid.mb-6 .text-3xl{ font-size: 1.5rem !important; } /* sayılar */
+    #teacher-genel-ozet .grid.mb-6 .p-3{ padding: 0.5rem !important; } /* ikon arka planı */
+    
+    /* Sınıf bar grafiği mobil yükseklik ayarı */
+    #teacher-genel-ozet .h-80{
+      height: 18rem !important; /* ~288px */
+    }
+    #teacher-genel-ozet .h-80 canvas{
+      max-height: 288px !important;
+    }
+
+    /* Kart içi metinleri daha rahat sığdırabilmek için */
+    #teacher-stat-daily-name,
+    #teacher-stat-weekly-name,
+    #teacher-stat-monthly-name{
+      max-width: 100%;
+    }
+  }
+</style>
+<style id="teacher-genel-ders-dagilim-patch">
+/* Genel Özet → Derslere Göre dağılım tablosu: 2 satır kırpma ve yatay kaydırmayı engelleme */
+@media (max-width: 640px){
+  /* Tablo sarmalayıcıda yatay kaydırmayı kapat */
+  #teacher-genel-ozet .table-container{
+    overflow-x: hidden !important;
+  }
+  /* Tabloda sabit yerleşim ve esnek kırılma */
+  #teacher-genel-ozet .table-container table{
+    table-layout: fixed !important;
+    width: 100% !important;
+    border-collapse: separate; /* mevcut stilleri bozmamak için */
+  }
+  /* Hücrelerde metin sarımı ve daralmasına izin ver */
+  #teacher-genel-ozet .table-container table th,
+  #teacher-genel-ozet .table-container table td{
+    white-space: normal !important;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    min-width: 0;
+  }
+  /* İlk sütun (Ders) en fazla iki satır gösterilsin */
+  #teacher-genel-ozet .table-container table tbody tr td:first-child{
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.25rem; /* ~20px */
+    max-height: calc(1.25rem * 2); /* 2 satır */
+  }
+  /* Gün sütunlarını daha dar tut (sayılar genelde 2-3 haneli) */
+  #teacher-genel-ozet .table-container table thead tr th:not(:first-child),
+  #teacher-genel-ozet .table-container table tbody tr td:not(:first-child){
+    width: 3.25rem; /* ~52px */
+  }
+}
+</style>
+<style id="teacher-ders-dagilim-mobile-patch">
+/* Genel Özet → Derslere Göre dağılım tablosu: 2 satır, kaydırmasız mobil görünüm */
+@media (max-width: 640px){
+  /* Yana kaydırmayı kapat */
+  .ders-dagilim-wrap{ overflow-x: hidden !important; }
+
+  /* Tablo genişliği ve yerleşim */
+  table.ders-dagilim{
+    width: 100% !important;
+    min-width: 0 !important;       /* Tailwind min-w-[400px]'i geçersiz kıl */
+    table-layout: fixed !important; /* Sütunları sabitle, sarma için uygun */
+    border-collapse: separate;
+  }
+
+  /* Hücre metinlerinin sarımı ve sıkı padding */
+  table.ders-dagilim th,
+  table.ders-dagilim td{
+    white-space: normal !important;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    min-width: 0;
+    padding: 0.5rem 0.5rem !important; /* mobilde daha kompakt */
+  }
+
+  /* İlk sütun: Ders adı — en fazla 2 satır, daha küçük yazı */
+  table.ders-dagilim td:first-child{
+    font-size: 0.82rem !important;    /* ~13px */
+    line-height: 1.2 !important;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  /* Ders sütununa alan önceliği; diğer sütunlar dar */
+  table.ders-dagilim th:first-child,
+  table.ders-dagilim td:first-child{ width: 55% !important; }
+  table.ders-dagilim thead th:not(:first-child),
+  table.ders-dagilim tbody td:not(:first-child){
+    width: 2.8rem !important; /* ~45px */
+    text-align: center !important;
+  }
+}
 </style>
 </head>
 <body class="bg-gradient-to-br from-indigo-800 via-purple-800 to-indigo-900 text-white min-h-screen">
@@ -379,8 +518,8 @@
 <input class="w-full p-2.5 rounded-lg dark-input" id="reg-ad" placeholder="Ad" required="" type="text"/>
 <input class="w-full p-2.5 rounded-lg dark-input" id="reg-soyad" placeholder="Soyad" required="" type="text"/>
 <select class="w-full p-2.5 rounded-lg dark-input" id="sinif-select-register" required="">
-    <option value="" selected disabled>Sınıfınızı Seçin</option>
-  </select>
+<option disabled="" selected="" value="">Sınıfınızı Seçin</option>
+</select>
 <input class="w-full p-2.5 rounded-lg dark-input" id="reg-sifre" placeholder="Şifre" required="" type="password"/>
 <input class="w-full p-2.5 rounded-lg dark-input" id="reg-sifre-tekrar" placeholder="Şifre Tekrar" required="" type="password"/>
 <button class="w-full bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 font-medium transition duration-150 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-purple-900" type="submit">
@@ -525,8 +664,8 @@
 </div>
 <div class="bg-black bg-opacity-20 backdrop-blur-lg rounded-2xl shadow-2xl p-6 border border-white border-opacity-20">
 <h2 class="text-2xl font-bold mb-5 text-purple-300" id="today-entries-title">Son Eklenenler</h2>
-<div class="overflow-x-auto table-container">
-<table class="w-full min-w-[400px] text-left">
+<div class="table-container overflow-x-auto ders-dagilim-wrap">
+<table class="min-w-[400px] text-left ders-dagilim w-full">
 <thead class="border-b border-white border-opacity-30">
 <tr>
 <th class="py-2 px-3 text-sm font-semibold uppercase text-gray-300">Ders</th>
@@ -608,8 +747,8 @@
 </div>
 <div class="bg-transparent bg-opacity-20 backdrop-blur-lg rounded-2xl shadow-2xl p-6 border border-white border-opacity-20" style="background: linear-gradient(135deg, #411d6e 0%, #4d2281 50%, #55258e 100%) !important;">
 <h3 class="text-lg font-semibold mb-4 text-purple-300">Derslere Göre Haftalık Döküm (Toplam Soru)</h3>
-<div class="overflow-x-auto table-container">
-<table class="w-full text-left">
+<div class="table-container overflow-x-auto ders-dagilim-wrap">
+<table class="text-left ders-dagilim w-full">
 <thead class="border-b border-white border-opacity-30">
 <tr>
 <th class="py-2 px-3 text-xs font-semibold uppercase text-gray-300 sticky left-0 z-10" style="background-color: rgba(0,0,0,0.2); backdrop-filter: blur(10px);">Ders</th>
@@ -647,8 +786,8 @@
 </div>
 <div class="bg-transparent bg-opacity-20 backdrop-blur-lg rounded-2xl shadow-2xl p-6 border border-white border-opacity-20" style="background: linear-gradient(135deg, #411d6e 0%, #4d2281 50%, #55258e 100%) !important;">
 <h3 class="text-lg font-semibold mb-4 text-purple-300">Aylık Ders Dökümü</h3>
-<div class="overflow-x-auto table-container">
-<table class="w-full min-w-[500px] text-left">
+<div class="table-container overflow-x-auto ders-dagilim-wrap">
+<table class="ders-dagilim text-left w-full min-w-[500px]">
 <thead class="border-b border-white border-opacity-30">
 <tr>
 <th class="py-2 px-3 text-sm font-semibold uppercase text-gray-300">Ders</th>
@@ -668,7 +807,22 @@
 </div>
 </div>
 </div>
+<div class="modal-backdrop" id="studentTeacherMsgModal">
+<div class="modal-content bg-transparent bg-opacity-20 backdrop-blur-xl rounded-2xl shadow-2xl border border-white border-opacity-20 max-w-lg mx-auto">
+<div class="flex justify-between items-center mb-4">
+<h2 class="text-2xl font-bold text-purple-300">Öğretmen Mesajı</h2>
 </div>
+<p class="text-sm text-purple-200 mb-3" id="student-teacher-msg-from-line"></p>
+<div class="bg-black bg-opacity-30 rounded-xl p-4 border border-white border-opacity-10 mb-6">
+<p class="whitespace-pre-wrap text-gray-100" id="student-teacher-msg-text"></p>
+</div>
+<div class="flex justify-center">
+<button class="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-medium focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2 focus:ring-offset-purple-900" id="student-teacher-msg-close-btn">
+        Kapat ve Sil
+      </button>
+</div>
+</div>
+</div></div>
 <div class="hidden" id="parent-panel">
 <nav class="bg-transparent bg-opacity-20 backdrop-blur-lg shadow-lg border-b border-white border-opacity-10 sticky top-0 z-50" style="background: linear-gradient(135deg, #411d6e 0%, #4d2281 50%, #55258e 100%) !important;">
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -705,7 +859,6 @@
 </div>
 <div>
 <div class="panel-tab-content space-y-8" id="parent-genel-ozet">
-
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
 <div class="bg-transparent bg-opacity-20 backdrop-blur-lg rounded-2xl shadow-xl p-6 border border-white border-opacity-20 flex items-center space-x-4" style="background: linear-gradient(135deg, #411d6e 0%, #4d2281 50%, #55258e 100%) !important;">
 <div class="bg-purple-600 bg-opacity-30 p-3 rounded-full"><ion-icon class="text-4xl text-purple-300" name="checkmark-done-circle-outline"></ion-icon></div>
@@ -733,8 +886,8 @@
 <div class="lg:col-span-3">
 <div class="bg-transparent bg-opacity-20 backdrop-blur-lg rounded-2xl shadow-xl border border-white border-opacity-20 overflow-hidden" style="background: linear-gradient(135deg, #411d6e 0%, #4d2281 50%, #55258e 100%) !important;">
 <h3 class="text-xl font-semibold text-white p-6 border-b border-white border-opacity-10">Derslere Göre Dağılım</h3>
-<div class="overflow-x-auto">
-<table class="w-full min-w-full">
+<div class="overflow-x-auto ders-dagilim-wrap">
+<table class="w-full ders-dagilim min-w-full">
 <thead class="bg-white bg-opacity-10">
 <tr>
 <th class="py-3 px-6 text-left text-sm font-medium text-gray-300 uppercase tracking-wider">Ders Adı</th>
@@ -742,7 +895,6 @@
 <th class="py-3 px-6 text-left text-sm font-medium text-gray-300 uppercase tracking-wider">Doğru</th>
 <th class="py-3 px-6 text-left text-sm font-medium text-gray-300 uppercase tracking-wider">Yanlış</th>
 <th class="py-3 px-6 text-left text-sm font-medium text-gray-300 uppercase tracking-wider">Başarı</th>
-
 </tr>
 </thead>
 <tbody class="divide-y divide-white divide-opacity-10" id="parent-ders-tablosu-body">
@@ -752,24 +904,19 @@
 </div>
 </div>
 </div>
-
 </div>
-
 <!-- MOBILE PATCH: Ders dağılımı donut + AI özet -->
 <div class="sm:hidden grid grid-cols-1 gap-4" id="parent-genel-mobile-block">
-  <div class="bg-transparent bg-opacity-20 backdrop-blur-lg rounded-2xl shadow-xl border border-white border-opacity-20 overflow-hidden"
-       style="background: linear-gradient(135deg, #411d6e 0%, #4d2281 50%, #55258e 100%) !important;">
-    <h3 class="text-lg font-semibold text-white p-4 border-b border-white border-opacity-10">
+<div class="bg-transparent bg-opacity-20 backdrop-blur-lg rounded-2xl shadow-xl border border-white border-opacity-20 overflow-hidden" style="background: linear-gradient(135deg, #411d6e 0%, #4d2281 50%, #55258e 100%) !important;">
+<h3 class="text-lg font-semibold text-white p-4 border-b border-white border-opacity-10">
       Ders Dağılımı (Özet)
     </h3>
-    <div class="p-4">
-      <canvas id="parent-genel-donut-canvas" height="220"></canvas>
-    </div>
-  </div>
-
-  <!-- AI özet butonu -->
-  <button id="getGeminiSummary"
-          class="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-4 rounded-xl transition">
+<div class="p-4">
+<canvas height="220" id="parent-genel-donut-canvas"></canvas>
+</div>
+</div>
+<!-- AI özet butonu -->
+<button class="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-4 rounded-xl transition" id="getGeminiSummary">
     Yapay Zeka Özeti
   </button>
 </div>
@@ -839,8 +986,8 @@
 </div>
 <div class="bg-transparent bg-opacity-20 backdrop-blur-lg rounded-2xl shadow-2xl p-6 border border-white border-opacity-20" style="background: linear-gradient(135deg, #411d6e 0%, #4d2281 50%, #55258e 100%) !important;">
 <h3 class="text-lg font-semibold mb-4 text-purple-300">Derslere Göre Haftalık Döküm (Toplam Soru)</h3>
-<div class="overflow-x-auto table-container">
-<table class="w-full text-left">
+<div class="table-container overflow-x-auto ders-dagilim-wrap">
+<table class="text-left ders-dagilim w-full">
 <thead class="border-b border-white border-opacity-30">
 <tr>
 <th class="py-2 px-3 text-xs font-semibold uppercase text-gray-300 sticky left-0 z-10" style="background-color: rgba(0,0,0,0.2); backdrop-filter: blur(10px);">Ders</th>
@@ -878,8 +1025,8 @@
 </div>
 <div class="bg-transparent bg-opacity-20 backdrop-blur-lg rounded-2xl shadow-2xl p-6 border border-white border-opacity-20" style="background: linear-gradient(135deg, #411d6e 0%, #4d2281 50%, #55258e 100%) !important;">
 <h3 class="text-lg font-semibold mb-4 text-purple-300">Aylık Ders Dökümü</h3>
-<div class="overflow-x-auto table-container">
-<table class="w-full min-w-[500px] text-left">
+<div class="table-container overflow-x-auto ders-dagilim-wrap">
+<table class="ders-dagilim text-left w-full min-w-[500px]">
 <thead class="border-b border-white border-opacity-30">
 <tr>
 <th class="py-2 px-3 text-sm font-semibold uppercase text-gray-300">Ders</th>
@@ -1058,22 +1205,15 @@
 <button class="student-detail-tab-button flex-auto text-sm font-medium py-2 px-3 rounded-md" data-tab="tsr-aylik-rapor">Aylık Rapor</button>
 <button class="student-detail-tab-button flex-auto text-sm font-medium py-2 px-3 rounded-md" data-tab="tsr-ogretmen-mesaji">Öğretmen Mesajı</button>
 </div>
-
 <div class="student-detail-tab-content" id="tsr-ogretmen-mesaji">
-  <div class="bg-transparent bg-opacity-20 backdrop-blur-lg rounded-2xl shadow-2xl p-6 border border-white border-opacity-20">
-    <h2 class="text-2xl font-bold mb-5 text-purple-300">Öğretmen Mesajı</h2>
-    <p class="text-gray-200 mb-4">Bu alan, seçili öğrenci için öğretmen tarafından bırakılan not veya mesaj içindir.</p>
-    <div class="space-y-3">
-      <textarea id="tsr-teacher-msg-input" class="w-full p-3 rounded-lg dark-input min-h-[120px]" placeholder="Mesajınızı yazın..."></textarea>
-      <button id="tsr-teacher-msg-save" class="bg-purple-600 hover:bg-purple-700 text-white font-medium py-2.5 px-4 rounded-lg transition">Kaydet</button>
-    </div>
-    <div class="mt-6">
-      <h3 class="text-lg font-semibold text-purple-300 mb-2">Son Mesaj</h3>
-      <div id="tsr-teacher-msg-view" class="bg-black bg-opacity-20 rounded-xl p-4 border border-white border-opacity-10 text-gray-200">
-        Henüz mesaj yok.
-      </div>
-    </div>
-  </div>
+<div class="bg-transparent bg-opacity-20 backdrop-blur-lg rounded-2xl shadow-2xl p-6 border border-white border-opacity-20">
+<h2 class="text-2xl font-bold mb-5 text-purple-300">Öğretmen Mesajı</h2>
+<p class="text-gray-200 mb-4">Bu alan, seçili öğrenci için öğretmen tarafından bırakılan not veya mesaj içindir.</p>
+<div class="space-y-3">
+<textarea class="w-full p-3 rounded-lg dark-input min-h-[120px]" id="tsr-teacher-msg-input" placeholder="Mesajınızı yazın..."></textarea>
+<button class="mx-auto block bg-purple-600 hover:bg-purple-700 text-white font-medium py-2.5 px-4 rounded-lg transition" id="tsr-teacher-msg-save">Mesajı Gönder</button>
+</div>
+</div>
 </div>
 <div>
 <div class="student-detail-tab-content" id="tsr-gunluk-rapor">
@@ -1105,8 +1245,8 @@
 </div>
 <div class="mt-8 hidden" id="tsr-daily-details">
 <h3 class="text-lg font-semibold text-purple-300 mb-4" id="tsr-details-title">Seçilen Günün Detayları</h3>
-<div class="overflow-x-auto table-container">
-<table class="w-full min-w-[400px] text-left">
+<div class="table-container overflow-x-auto ders-dagilim-wrap">
+<table class="min-w-[400px] text-left ders-dagilim w-full">
 <thead class="border-b border-white border-opacity-30">
 <tr>
 <th class="py-2 px-3 text-sm font-semibold uppercase text-gray-300">Ders</th>
@@ -1140,8 +1280,8 @@
 </div>
 <div class="bg-transparent bg-opacity-20 backdrop-blur-lg rounded-2xl shadow-2xl p-6 border border-white border-opacity-20" style="background: linear-gradient(135deg, #411d6e 0%, #4d2281 50%, #55258e 100%) !important;">
 <h3 class="text-lg font-semibold mb-4 text-purple-300">Derslere Göre Haftalık Döküm (Toplam Soru)</h3>
-<div class="overflow-x-auto table-container">
-<table class="w-full text-left">
+<div class="table-container overflow-x-auto ders-dagilim-wrap">
+<table class="text-left ders-dagilim w-full">
 <thead class="border-b border-white border-opacity-30">
 <tr>
 <th class="py-2 px-3 text-xs font-semibold uppercase text-gray-300 sticky left-0 z-10" style="background-color: rgba(0,0,0,0.2); backdrop-filter: blur(10px);">Ders</th>
@@ -1179,8 +1319,8 @@
 </div>
 <div class="bg-transparent bg-opacity-20 backdrop-blur-lg rounded-2xl shadow-2xl p-6 border border-white border-opacity-20" style="background: linear-gradient(135deg, #411d6e 0%, #4d2281 50%, #55258e 100%) !important;">
 <h3 class="text-lg font-semibold mb-4 text-purple-300">Aylık Ders Dökümü</h3>
-<div class="overflow-x-auto table-container">
-<table class="w-full min-w-[500px] text-left">
+<div class="table-container overflow-x-auto ders-dagilim-wrap">
+<table class="ders-dagilim text-left w-full min-w-[500px]">
 <thead class="border-b border-white border-opacity-30">
 <tr>
 <th class="py-2 px-3 text-sm font-semibold uppercase text-gray-300">Ders</th>
@@ -1202,6 +1342,7 @@
 </div>
 </div>
 </div>
+
 </div>
 <script>
         // ---------------------------------------------
@@ -1335,6 +1476,7 @@ if (type === 'success' || type === 'info') {
                     
                     document.getElementById('student-panel').classList.remove('hidden');
                     loadInitialData(); // Öğrencinin verilerini yükle
+                    checkStudentTeacherMessage(); // Varsa öğretmen mesajını göster
                 } else {
                     showScreen('auth-page');
                 }
@@ -1387,6 +1529,7 @@ document.getElementById('parent-panel').classList.remove('hidden');
                     if (tBelow) tBelow.textContent = `Öğretmen: ${toTitleCaseTR(currentUserName)}`;
                     
                     document.getElementById('teacher-panel').classList.remove('hidden');
+                    resetTeacherPanelTabsToOverview();
                     subscribeClassList();
                     subscribeStudents();
                     subscribeFavorites();
@@ -1428,6 +1571,140 @@ document.getElementById('parent-panel').classList.remove('hidden');
                 showNotification('Veri çekilirken hata oluştu.', 'error');
             });
         }
+
+        // Öğrenci panelinde öğretmen mesajını gösteren modal yardımcıları
+        
+        function getTurkishAblativeSuffix(name) {
+            if (!name) return "den";
+            var stem = String(name).trim();
+            if (!stem) return "den";
+            var lower = stem.toLocaleLowerCase('tr-TR');
+            var vowelsFront = "eiöü";
+            var vowelsBack = "aıou";
+            var lastVowel = null;
+            for (var i = lower.length - 1; i >= 0; i--) {
+                var ch = lower.charAt(i);
+                if (vowelsFront.indexOf(ch) !== -1 || vowelsBack.indexOf(ch) !== -1) {
+                    lastVowel = ch;
+                    break;
+                }
+            }
+            var vowel = 'e';
+            if (lastVowel && vowelsBack.indexOf(lastVowel) !== -1) {
+                vowel = 'a';
+            }
+            var lettersOnly = lower.replace(/[^a-zçğıöşü]/g, "");
+            var lastLetter = lettersOnly ? lettersOnly.charAt(lettersOnly.length - 1) : "";
+            var voiceless = "fstkçşhp";
+            var consonant = voiceless.indexOf(lastLetter) !== -1 ? 't' : 'd';
+            return consonant + vowel + 'n';
+        }
+
+        function showStudentTeacherMessageModal(msgObj) {
+            try {
+                var modal = document.getElementById('studentTeacherMsgModal');
+                if (!modal) return;
+
+                var fromLineEl = document.getElementById('student-teacher-msg-from-line');
+                var textEl = document.getElementById('student-teacher-msg-text');
+
+                var teacherNameRaw = (msgObj && (msgObj.byName || msgObj.by)) ? (msgObj.byName || msgObj.by) : 'Öğretmen';
+                var teacherName = (typeof toTitleCaseTR === 'function') ? toTitleCaseTR(teacherNameRaw) : teacherNameRaw;
+                var ablSuffix = getTurkishAblativeSuffix(teacherName);
+
+                if (fromLineEl) {
+                    fromLineEl.textContent = 'Öğretmenin ' + teacherName + "'" + ablSuffix + ' mesaj var.';
+                }
+                if (textEl) {
+                    textEl.textContent = (msgObj && msgObj.text) ? msgObj.text : '';
+                }
+
+                modal.style.display = 'block';
+            } catch(e) {
+                console.warn('Öğretmen mesajı modalı gösterilemedi:', e);
+            }
+        }
+
+        function hideStudentTeacherMessageModal() {
+            var modal = document.getElementById('studentTeacherMsgModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+
+        // Öğrenci girişi sonrasında, varsa öğretmen mesajını kontrol edip göster
+                function checkStudentTeacherMessage() {
+            try {
+                if (typeof database === 'undefined' || !database || !database.ref) return;
+                if (currentUserRole !== 'ogrenci') return;
+
+                var sid = currentStudentId;
+                if (!sid) return;
+
+                var primaryRef = database.ref('students/' + sid + '/teacherMessage');
+                var legacyRef  = database.ref('users/ogrenciler/' + sid + '/ogretmenMesaji');
+
+                function bindCloseButton(refToClear) {
+                    var btn = document.getElementById('student-teacher-msg-close-btn');
+                    if (btn && !btn.dataset.boundTeacherMsg) {
+                        btn.dataset.boundTeacherMsg = 'true';
+                        btn.addEventListener('click', function(){
+                            refToClear.remove()
+                                .catch(function(err){
+                                    console.error('Öğretmen mesajı silinemedi:', err);
+                                })
+                                .finally(function(){
+                                    hideStudentTeacherMessageModal();
+                                    try {
+                                        var soruTabBtn = document.querySelector('.student-panel-tab-button[data-tab="soru-girisi"]');
+                                        if (soruTabBtn) {
+                                            soruTabBtn.click();
+                                        }
+                                    } catch(e2){
+                                        console.warn('Soru girişi sekmesine geçilirken hata:', e2);
+                                    }
+                                });
+                        });
+                    }
+                }
+
+                primaryRef.once('value').then(function(snapshot){
+                    if (snapshot && snapshot.exists()) {
+                        var raw = snapshot.val() || {};
+                        if (!raw.msg) return;
+
+                        var data = {
+                            text: raw.msg,
+                            byName: raw.teacher || 'Öğretmen',
+                            at: raw.ts || null
+                        };
+
+                        showStudentTeacherMessageModal(data);
+                        bindCloseButton(primaryRef);
+                        return;
+                    }
+
+                    // Eski path'ten de kontrol et (geriye dönük uyumluluk)
+                    legacyRef.once('value').then(function(snapshotOld){
+                        if (!snapshotOld || !snapshotOld.exists()) return;
+
+                        var legacy = snapshotOld.val() || {};
+                        if (!legacy.text) return;
+
+                        showStudentTeacherMessageModal(legacy);
+                        bindCloseButton(legacyRef);
+                    }).catch(function(err){
+                        console.error('Eski öğretmen mesajı kontrol edilirken hata:', err);
+                    });
+                }).catch(function(err){
+                    console.error('Öğretmen mesajı kontrol edilirken hata:', err);
+                });
+            } catch(eOuter) {
+                console.warn('checkStudentTeacherMessage çalıştırılamadı:', eOuter);
+            }
+        }
+
         
         // Veli ve Öğrenci Panellerindeki istatistikleri ortak güncelleme (GÜNCELLENDİ - İSTEK 1)
         
@@ -2030,6 +2307,7 @@ if (weeklyDetailsBodyEl.children.length === 0) {
 
             showScreen('auth-page');
             setupTeacherPanel();
+            resetTeacherPanelTabsToOverview();
             // Sınıf listesi: kayıt dropdown'u ile senkron (öğretmen paneli açılmasa bile)
             try { subscribeClassList(); } catch(e) {} // YENİ: Öğretmen paneli dinleyicilerini kur
 
@@ -2219,7 +2497,7 @@ if (weeklyDetailsBodyEl.children.length === 0) {
                     }
                     // --- /İSTEK 3 ---
                     showNotification(`Giriş Başarılı! Hoş geldiniz, ${toTitleCaseTR(adSoyad)}.`, 'success');
-                    showScreen('teacher-panel', { adSoyad: adSoyad });
+                    currentUserRole='ogretmen'; currentUserName=adSoyad; updateFavoritesPath(); subscribeFavorites(); showScreen('teacher-panel', { adSoyad: adSoyad });
                     if (!remember) e.target.reset();
                 } else {
                     showNotification("Hata: Girilen kod yanlış.", 'error');
@@ -2358,7 +2636,8 @@ function populateRegistrationClassSelect() {
 }
 const CLASSLIST_PATH = 'system/siniflar';
 let classList = [];
-const FAVORITES_PATH = 'system/favorites';
+let FAVORITES_PATH = null;
+function updateFavoritesPath(){ if(currentUserRole==='ogretmen' && currentUserName){ FAVORITES_PATH='system/favorites/'+currentUserName; }}
 
 function titleTR(str) {
   if (!str) return '';
@@ -2430,7 +2709,7 @@ function subscribeClassList() {
 }
 
 function subscribeFavorites() {
-    database.ref(FAVORITES_PATH).on('value', function(snap) {
+    if(!FAVORITES_PATH) return; database.ref(FAVORITES_PATH).on('value', function(snap) {
         teacherFavorites = snap.val() || {};
         
         // DÜZELTME: YARIŞ DURUMU (RACE CONDITION) DÜZELTMESİ
@@ -2452,7 +2731,7 @@ function toggleFavorite(e) {
             if (!studentId) return;
             var icon = starButton.querySelector('ion-icon');
             var isCurrentlyFavorited = starButton.classList.contains('favorited');
-            var favRef = database.ref(`${FAVORITES_PATH}/${studentId}`);
+            if(!FAVORITES_PATH) return; var favRef = database.ref(FAVORITES_PATH + '/' + studentId);
 
             if (isCurrentlyFavorited) {
                 favRef.remove();
@@ -2522,6 +2801,9 @@ function launchStudentDetailModal(studentId, studentName) {
                 showNotification("Öğrenci bilgisi alınamadı.", "error");
                 return;
             }
+
+            // Öğretmen mesajları ve raporlar için global öğrenci ID'sini güncelle
+            try { currentStudentId = studentId; } catch(e) {}
 
             // Modalı göster, yükleniyor ekranını aç
             studentDetailModal.style.display = 'block';
@@ -2860,6 +3142,37 @@ function setupTeacherPanel() {
 })();
         }
 
+
+function resetTeacherPanelTabsToOverview() {
+    const teacherPanel = document.getElementById('teacher-panel');
+    if (!teacherPanel) return;
+
+    const tabs = teacherPanel.querySelectorAll('.panel-tab-button');
+    const contents = teacherPanel.querySelectorAll('.panel-tab-content');
+
+    const activeTabClasses = ['bg-purple-600', 'text-white', 'shadow-md'];
+    const inactiveTabClasses = ['text-gray-300', 'hover:bg-white', 'hover:bg-opacity-10'];
+
+    tabs.forEach(tab => {
+        tab.classList.remove(...activeTabClasses);
+        tab.classList.add(...inactiveTabClasses);
+    });
+
+    contents.forEach(content => content.classList.remove('active'));
+
+    const defaultTab = teacherPanel.querySelector('.panel-tab-button[data-tab="teacher-genel-ozet"]');
+    const defaultContent = document.getElementById('teacher-genel-ozet');
+
+    if (defaultTab) {
+        defaultTab.classList.add(...activeTabClasses);
+        defaultTab.classList.remove(...inactiveTabClasses);
+    }
+    if (defaultContent) {
+        defaultContent.classList.add('active');
+    }
+}
+
+
 function loadTeacherData() {
             if (teacherDataListenersStarted) return;
             teacherDataListenersStarted = true;
@@ -3111,7 +3424,6 @@ document.addEventListener('DOMContentLoaded', function () {
       .join(' ');
   }
 </script>
-
 <script id="parent-genel-mobile-patch-js">
 // == MOBILE PATCH: donut + AI summary ==
 (function(){
@@ -3259,55 +3571,82 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 })();
 
-// === ÖĞRETMEN MESAJI SEKME MANTIĞI (Yerel - localStorage) ===
+
+// === ÖĞRETMEN MESAJI SEKME MANTIĞI (Firebase tabanlı) ===
 (function(){
-  function keyForStudent(id){ return 'tsr_teacher_msg_' + (id || 'unknown'); }
-  function renderTeacherMsg(){
-    try {
-      var view = document.getElementById('tsr-teacher-msg-view');
-      if(!view) return;
-      var sid = (typeof currentStudentId !== 'undefined') ? currentStudentId : null;
-      var raw = localStorage.getItem(keyForStudent(sid));
-      if(!raw){ view.textContent = 'Henüz mesaj yok.'; return; }
-      var obj = JSON.parse(raw);
-      var d = new Date(obj.at || Date.now());
-      var who = (typeof currentUserName !== 'undefined' && currentUserName) ? currentUserName : 'Öğretmen';
-      view.innerHTML = '<div class="text-sm text-gray-300 mb-2">' + d.toLocaleString('tr-TR') + ' - ' + who + '</div>' +
-                       '<div class="whitespace-pre-wrap">' + (obj.text || '') + '</div>';
-    } catch(e){ console.warn('Mesaj görüntüleme hatası:', e); }
+  function pathForStudentMessage(id){
+    return 'students/' + id + '/teacherMessage';
   }
-  function attachHandlers(){
+
+  function attachTeacherMessageHandlers(){
     var btn = document.getElementById('tsr-teacher-msg-save');
     var ta = document.getElementById('tsr-teacher-msg-input');
-    if(btn && ta){
-      btn.addEventListener('click', function(){
-        var t = (ta.value || '').trim();
-        if(!t){ showNotification('Lütfen bir mesaj yazın.', 'info'); return; }
-        try {
-          var payload = { text: t, by: (typeof currentUserName !== 'undefined' ? currentUserName : ''), at: new Date().toISOString() };
-          var sid = (typeof currentStudentId !== 'undefined') ? currentStudentId : null;
-          localStorage.setItem(keyForStudent(sid), JSON.stringify(payload));
-          showNotification('Mesaj kaydedildi.', 'success');
-          renderTeacherMsg();
-        } catch(e){
-          console.warn(e); showNotification('Mesaj kaydedilemedi.', 'error');
+    if(!btn || !ta){ return; }
+
+    btn.addEventListener('click', function(){
+      var t = (ta.value || '').trim();
+      if(!t){
+        if (typeof showNotification === 'function') {
+          showNotification('Lütfen bir mesaj yazın.', 'info');
         }
-      });
-    }
-    // Sekme butonuna tıklanınca veriyi yenile
-    var tabBtn = document.querySelector('.student-detail-tab-button[data-tab="tsr-ogretmen-mesaji"]');
-    if(tabBtn){
-      tabBtn.addEventListener('click', function(){ setTimeout(renderTeacherMsg, 50); });
-    }
-    // Modal açılmış olabilir; kısa gecikmeyle bir kez render et
-    setTimeout(renderTeacherMsg, 150);
+        return;
+      }
+
+      var sid = (typeof currentStudentId !== 'undefined') ? currentStudentId : null;
+      if(!sid){
+        if (typeof showNotification === 'function') {
+          showNotification('Lütfen önce bir öğrenci seçin.', 'error');
+        }
+        return;
+      }
+
+      try {
+        var payload = {
+          msg: t,
+          teacher: (typeof currentUserName !== 'undefined' && currentUserName) ? currentUserName : 'Öğretmen',
+          ts: Date.now(),
+          fromTeacherId: (typeof currentTeacherId !== 'undefined')
+            ? currentTeacherId
+            : ((typeof currentUserId !== 'undefined') ? currentUserId : null)
+        };
+
+        if (typeof database === 'undefined' || !database || !database.ref) {
+          console.warn('Firebase database tanımlı değil, mesaj kaydedilemedi.');
+          if (typeof showNotification === 'function') {
+            showNotification('Mesaj kaydedilemedi (bağlantı yok).', 'error');
+          }
+          return;
+        }
+
+        database.ref(pathForStudentMessage(sid)).set(payload)
+          .then(function(){
+            ta.value = '';
+            if (typeof showNotification === 'function') {
+              showNotification('Mesaj gönderildi.', 'success');
+            }
+          })
+          .catch(function(err){
+            console.error('Öğretmen mesajı kaydedilemedi:', err);
+            if (typeof showNotification === 'function') {
+              showNotification('Mesaj kaydedilemedi.', 'error');
+            }
+          });
+      } catch(e){
+        console.warn('Öğretmen mesajı kaydedilemedi:', e);
+        if (typeof showNotification === 'function') {
+          showNotification('Mesaj kaydedilemedi.', 'error');
+        }
+      }
+    });
   }
+
   if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', attachHandlers);
+    document.addEventListener('DOMContentLoaded', attachTeacherMessageHandlers);
   } else {
-    attachHandlers();
+    attachTeacherMessageHandlers();
   }
 })();
+;
 
 </script>
 </body>
